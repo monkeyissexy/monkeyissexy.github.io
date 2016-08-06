@@ -1,0 +1,806 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="架构图
+概览本系统架构，是以实现一个高可用、可伸缩性强、用户体验佳、安全性好为目标而设计的。
+各层说明前端层
+WEB、MOBILE、MERCHANT（商户服务器）
+
+优点
+提升开发效率
+结构清晰
+可读性强
+可维护性强
+前后端充分解耦
+利于页面的加载优化
+
+WEB/MOBILE模块层，为纯js、css、html（angularjs+requirejs）架构，与服务器交互使用restful api接口">
+<meta property="og:type" content="article">
+<meta property="og:title" content="某系统架构">
+<meta property="og:url" content="https://monkeyissexy.github.io/2016/07/15/architecture-one/index.html">
+<meta property="og:site_name" content="Monkey is Sexy!">
+<meta property="og:description" content="架构图
+概览本系统架构，是以实现一个高可用、可伸缩性强、用户体验佳、安全性好为目标而设计的。
+各层说明前端层
+WEB、MOBILE、MERCHANT（商户服务器）
+
+优点
+提升开发效率
+结构清晰
+可读性强
+可维护性强
+前后端充分解耦
+利于页面的加载优化
+
+WEB/MOBILE模块层，为纯js、css、html（angularjs+requirejs）架构，与服务器交互使用restful api接口">
+<meta property="og:image" content="https://raw.githubusercontent.com/monkeyissexy/attachment/master/images/paymax.png">
+<meta property="og:updated_time" content="2016-08-06T05:38:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="某系统架构">
+<meta name="twitter:description" content="架构图
+概览本系统架构，是以实现一个高可用、可伸缩性强、用户体验佳、安全性好为目标而设计的。
+各层说明前端层
+WEB、MOBILE、MERCHANT（商户服务器）
+
+优点
+提升开发效率
+结构清晰
+可读性强
+可维护性强
+前后端充分解耦
+利于页面的加载优化
+
+WEB/MOBILE模块层，为纯js、css、html（angularjs+requirejs）架构，与服务器交互使用restful api接口">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/monkeyissexy/attachment/master/images/paymax.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://monkeyissexy.github.io/2016/07/15/architecture-one/"/>
+
+  <title> 某系统架构 | Monkey is Sexy! </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?e3eaf9cb0e468d1de706431e5cafa74f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Monkey is Sexy!</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                某系统架构
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-07-15T15:51:17+08:00" content="2016-07-15">
+              2016-07-15
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">architecture</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/07/15/architecture-one/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/15/architecture-one/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="架构图"><a href="#架构图" class="headerlink" title="架构图"></a>架构图</h2><p><img src="https://raw.githubusercontent.com/monkeyissexy/attachment/master/images/paymax.png" alt="架构图"></p>
+<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p>本系统架构，是以实现一个高可用、可伸缩性强、用户体验佳、安全性好为目标而设计的。</p>
+<h2 id="各层说明"><a href="#各层说明" class="headerlink" title="各层说明"></a>各层说明</h2><h3 id="前端层"><a href="#前端层" class="headerlink" title="前端层"></a>前端层</h3><blockquote>
+<p>WEB、MOBILE、MERCHANT（商户服务器）</p>
+</blockquote>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>提升开发效率</li>
+<li>结构清晰</li>
+<li>可读性强</li>
+<li>可维护性强</li>
+<li>前后端充分解耦</li>
+<li>利于页面的加载优化</li>
+</ul>
+<p>WEB/MOBILE模块层，为纯js、css、html（angularjs+requirejs）架构，与服务器交互使用restful api接口；</p>
+<p>采用angularjs+requirejs前端js框架，在提升开发效率的同时，使得前端代码结构分明、清晰、可读性强，增加前端代码的可维护性，这是传统页面无法做到的。</p>
+<p>同时，这种方式有助于前后端充分解耦，完全面向restful接口开，使得前后端开发人员剥离开，与传统的jsp相比，前端开发不需要参和后端服务器代码，更纯粹、更专注；</p>
+<p>另外这种纯静态的结构，借助CDN可大大提高页面加载速度，提升用户提现；</p>
+<h3 id="API层"><a href="#API层" class="headerlink" title="API层"></a>API层</h3><blockquote>
+<p>API（为商户后台提供接口）、MERCHANT-API（为商户提供交易接口）</p>
+</blockquote>
+<p>这两个API模块都采用了Restful接口规范，均使用SSL保证通信安全：</p>
+<ul>
+<li>安全性<ul>
+<li>API 采用Oauth2.0标准协议，确保了接口安全性；</li>
+<li>MERCHANT-API 采用双向非对称加密，确保了接口安全；</li>
+</ul>
+</li>
+<li>高可用：前端采用SLB(阿里负载均衡)，服务器内部使用nginx做反向代理；</li>
+<li>缓存：REST设计的一个原则为有效利用缓存，所有POST、PUT和DELETE请求均不缓存，这一点由浏览器自身保证，无需额外的配置。对于GET请求，必须合理地配置缓存头，从而提高部分接口的响应效率；</li>
+</ul>
+<h3 id="业务层"><a href="#业务层" class="headerlink" title="业务层"></a>业务层</h3><blockquote>
+<p>所有业务逻辑都在这里</p>
+</blockquote>
+<ul>
+<li>交易回调：处理各第三方支付系统的回调；</li>
+<li>BUSINESS：串联所有基础服务模块，通过Dubbo连接（下面中间件会介绍）；</li>
+<li>微信网关：处理所有与微信接口的调用；</li>
+<li>后台：内部运营管理后台；</li>
+</ul>
+<h3 id="基础服务层"><a href="#基础服务层" class="headerlink" title="基础服务层"></a>基础服务层</h3><blockquote>
+<p>微服务架构（MSA）是一种架构概念，旨在通过将功能分解到各个离散的服务中以实现对解决方案的解耦，基础服务层之间，不直接调用，通过可靠的MQ来通信（下面中间件会介绍）；</p>
+</blockquote>
+<ul>
+<li><p>用户服务</p>
+<p>   提供用户相关基础逻辑接口，登录、注册等等；</p>
+</li>
+<li><p>订单模块</p>
+<p>  处理所有订单交易相关逻辑接口，提供查询接口、统计接口；</p>
+</li>
+<li><p>渠道模块</p>
+<p>  连接外部各种第三方支付系统，内部与订单模块交互；</p>
+</li>
+<li><p>账单模块</p>
+<p>  提供下载、存储所有商户在paymax的交易账单；</p>
+</li>
+<li><p>门店模块</p>
+<p>  提供所有门店系统相关接口；</p>
+</li>
+<li><p>商户服务</p>
+<p>  包含商户接入信息、资料等相关接口；</p>
+</li>
+<li><p>购物车模块</p>
+<p>  商户可在购物车下单购买所需要的渠道；</p>
+</li>
+<li><p>消息模块</p>
+<p>  提供sms、email发通知的功能；</p>
+</li>
+<li><p>api模块</p>
+<p>  提供商户后台接口，接口安全使用oauth；</p>
+</li>
+<li><p>merchant-api模块</p>
+<p>  提供交易相关接口，供商户服务器调用；</p>
+</li>
+</ul>
+<h3 id="中间件层"><a href="#中间件层" class="headerlink" title="中间件层"></a>中间件层</h3><blockquote>
+<p>ZOOKEEPER、REDIS、RDS、OSS、DUBBO、MQ</p>
+</blockquote>
+<ul>
+<li>Zookeeper</li>
+</ul>
+<blockquote>
+<p>ZooKeeper是一个高可用的分布式数据管理与系统协调框架。基于对Paxos算法的实现，使该框架保证了分布式环境中数据的强一致性</p>
+</blockquote>
+<p>使用zookeeper来处理分布式系统之间的协作，同时也保证了系统的一致性；</p>
+<ul>
+<li>Redis</li>
+</ul>
+<blockquote>
+<p>配合zookeeper的leader模式，开发出高可用的redis集群，保证了系统的稳定；</p>
+</blockquote>
+<p>在系统中主要是提供了高可用的内存缓存角色，从而大大提高了系统效率；</p>
+<ul>
+<li><p>RDS</p>
+<p>  使用的是阿里高可用的mysql，很好的解决了单点故障等问题；</p>
+</li>
+<li><p>OSS</p>
+<p>  分布式文件存储系统，高可用；也利于做CDN优化加载，提升用户体验；</p>
+</li>
+<li><p>DUBBO</p>
+</li>
+</ul>
+<blockquote>
+<p>DUBBO是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">透明：使得RPC接口管理变得透明；</div><div class="line">伸缩性：系统平行扩展很方便，可以根据业务量，很简单的弹性上下架服务实例；</div><div class="line">监控：可对接口的调用做监控，次数、效率等等，对暴露的问题提前优化；</div></pre></td></tr></table></figure>
+<ul>
+<li>MQ</li>
+</ul>
+<blockquote>
+<p>使用了可靠的消息队列，添加了ack机制及发送策略；</p>
+</blockquote>
+<p>使得系统间解耦，可靠消息机制，也保证了系统间数据的一致性；</p>
+<h3 id="监控"><a href="#监控" class="headerlink" title="监控"></a>监控</h3><blockquote>
+<p>采用zabbix，对各中间件、服务进程进行了监控，出现问题实时报警；</p>
+</blockquote>
+<h3 id="第三方依赖"><a href="#第三方依赖" class="headerlink" title="第三方依赖"></a>第三方依赖</h3><ul>
+<li><p>天翼</p>
+<p>  发短信</p>
+</li>
+<li><p>创蓝</p>
+<p>  发短信</p>
+</li>
+<li><p>微信</p>
+<p>  使用其提供的公众号相关接口，以及支付功能；</p>
+</li>
+<li><p>支付宝</p>
+<p>  使用其提供的支付功能；</p>
+</li>
+<li><p>拉卡拉</p>
+<p>  使用其提供的支付功能；</p>
+</li>
+<li><p>APPLE PAY</p>
+<p>  使用其提供的支付功能；</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/13/jvm-optimization/" rel="next" title="JVM 调优">
+                <i class="fa fa-chevron-left"></i> JVM 调优
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/02/redis-sentinel/" rel="prev" title="Redis Sentinel 入门搭建">
+                Redis Sentinel 入门搭建 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/07/15/architecture-one/"
+           data-title="某系统架构" data-url="https://monkeyissexy.github.io/2016/07/15/architecture-one/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="hongliang wang" />
+          <p class="site-author-name" itemprop="name">hongliang wang</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#架构图"><span class="nav-number">1.</span> <span class="nav-text">架构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#概览"><span class="nav-number">2.</span> <span class="nav-text">概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#各层说明"><span class="nav-number">3.</span> <span class="nav-text">各层说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前端层"><span class="nav-number">3.1.</span> <span class="nav-text">前端层</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点"><span class="nav-number">3.1.1.</span> <span class="nav-text">优点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#API层"><span class="nav-number">3.2.</span> <span class="nav-text">API层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#业务层"><span class="nav-number">3.3.</span> <span class="nav-text">业务层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基础服务层"><span class="nav-number">3.4.</span> <span class="nav-text">基础服务层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#中间件层"><span class="nav-number">3.5.</span> <span class="nav-text">中间件层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控"><span class="nav-number">3.6.</span> <span class="nav-text">监控</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三方依赖"><span class="nav-number">3.7.</span> <span class="nav-text">第三方依赖</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hongliang wang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"monkeyissexy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
