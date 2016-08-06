@@ -94,7 +94,7 @@
 <meta property="og:description" content="转载 原文：http://blog.csdn.net/zxhoo/article/details/38349011
 
 函数式接口理解Functional Interface（函数式接口，以下简称FI）是学习Java8 Lambda表达式的关键所在，所以放在最开始讨论。FI的定义其实很简单：任何接口，如果只包含 唯一 一个抽象方法，那么它就是一个FI。为了让编译器帮助我们确保一个接口满足FI的要求">
-<meta property="og:updated_time" content="2016-08-06T05:38:55.000Z">
+<meta property="og:updated_time" content="2016-08-06T06:48:56.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java8 Lambda">
 <meta name="twitter:description" content="转载 原文：http://blog.csdn.net/zxhoo/article/details/38349011
@@ -332,6 +332,7 @@
 <p>转载 原文：<a href="http://blog.csdn.net/zxhoo/article/details/38349011" target="_blank" rel="external">http://blog.csdn.net/zxhoo/article/details/38349011</a></p>
 </blockquote>
 <h3 id="函数式接口"><a href="#函数式接口" class="headerlink" title="函数式接口"></a>函数式接口</h3><p>理解Functional Interface（函数式接口，以下简称FI）是学习Java8 Lambda表达式的关键所在，所以放在最开始讨论。FI的定义其实很简单：任何接口，如果只包含 唯一 一个抽象方法，那么它就是一个FI。为了让编译器帮助我们确保一个接口满足FI的要求（也就是说有且仅有一个抽象方法），Java8提供了@FunctionalInterface注解。举个简单的例子，Runnable接口就是一个FI，下面是它的源代码：</p>
+<a id="more"></a>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@FunctionalInterface</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Runnable</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h3 id="Lambda语法"><a href="#Lambda语法" class="headerlink" title="Lambda语法"></a>Lambda语法</h3><p>为了能够方便、快捷、幽雅的创建出FI的实例，Java8提供了Lambda表达式这颗语法糖。下面我用一个例子来介绍Lambda语法。假设我们想对一个List<string>按字符串长度进行排序，那么在Java8之前，可以借助匿名内部类来实现：</string></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; words = Arrays.asList(<span class="string">"apple"</span>, <span class="string">"banana"</span>, <span class="string">"pear"</span>);</div><div class="line">words.sort(<span class="keyword">new</span> Comparator&lt;String&gt;() &#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(String w1, String w2)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> Integer.compare(w1.length(), w2.length());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure>

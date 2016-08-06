@@ -98,7 +98,7 @@ Java虚拟机规范，JVM将内存划分为：New、Tenured、Perm。其中New�
 
 
 New（年轻代">
-<meta property="og:updated_time" content="2016-08-06T06:19:18.000Z">
+<meta property="og:updated_time" content="2016-08-06T06:49:10.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM 调优">
 <meta name="twitter:description" content="内存划分
@@ -357,6 +357,7 @@ New（年轻代">
 </ul>
 </li>
 </ul>
+<a id="more"></a>
 <h2 id="内存参数说明"><a href="#内存参数说明" class="headerlink" title="内存参数说明"></a>内存参数说明</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">-Xmx5000M // max的heap的大小</div><div class="line">-Xms5000M // min的heap的大小</div><div class="line">-Xmn2000M // young区的大小，E＋S0＋S1＝Y</div><div class="line"></div><div class="line">因heap=y+o，</div><div class="line">如此就决定了old区大小为3000m </div><div class="line">或者 </div><div class="line">若不设置Xmn，可以使用newRatio配置y和o的比例；</div><div class="line"></div><div class="line">-Xss256k // 每个线程的堆栈大小, JDK5.0以后每个线程堆栈大小为1M，</div><div class="line">以前每个线程堆栈大小为256K.根据应用的线程所需内存大小进行调整；</div><div class="line">这个Stack Space不是来自Heap的分配。</div><div class="line">所以Stack Space的大小不会受到-Xmx和-Xms的影响</div><div class="line">Stack Space用尽之后，会抛出StackOverflow异常</div></pre></td></tr></table></figure>
 <h2 id="一些工具的使用"><a href="#一些工具的使用" class="headerlink" title="一些工具的使用"></a>一些工具的使用</h2><h3 id="jps-Java-Virtual-Machine-Process-Status-Tool"><a href="#jps-Java-Virtual-Machine-Process-Status-Tool" class="headerlink" title="jps (Java Virtual Machine Process Status Tool)"></a>jps (Java Virtual Machine Process Status Tool)</h3><ul>
 <li>查看所有jvm进程id</li>

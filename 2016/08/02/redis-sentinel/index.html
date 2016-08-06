@@ -92,7 +92,7 @@
 <meta property="og:site_name" content="Monkey is Sexy!">
 <meta property="og:description" content="redis sentinel (2.8.x)搭建
 本来使用的是最新稳定版3.2.2，这个版本对redis的安全性方面，也做了很多改进，但是在搭建好之后，连接sentinel的时候，出现和protected-mode相关的问题，google了下没有解决，所以讲版本降低到2.8.24版本进行测试。2.8.x版本中sentinel2已经是稳定版了，所以不影响演示，等有时间了把3.2.2的那个问题给解决了">
-<meta property="og:updated_time" content="2016-08-06T05:38:55.000Z">
+<meta property="og:updated_time" content="2016-08-06T06:49:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis Sentinel 入门搭建">
 <meta name="twitter:description" content="redis sentinel (2.8.x)搭建
@@ -329,6 +329,7 @@
 <p>本来使用的是最新稳定版3.2.2，这个版本对redis的安全性方面，也做了很多改进，但是在搭建好之后，连接sentinel的时候，出现和protected-mode相关的问题，google了下没有解决，所以讲版本降低到2.8.24版本进行测试。2.8.x版本中sentinel2已经是稳定版了，所以不影响演示，等有时间了把3.2.2的那个问题给解决了，再更新。。。</p>
 </blockquote>
 <h3 id="入门搭建演示"><a href="#入门搭建演示" class="headerlink" title="入门搭建演示"></a>入门搭建演示</h3><p>好了，让我们开始吧！</p>
+<a id="more"></a>
 <p>首先，从官网下载2.8版本redis源文件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">wget http://download.redis.io/releases/redis-2.8.24.tar.gz</div><div class="line">tar xzf redis-2.8.24.tar.gz</div><div class="line">cd redis-2.8.24</div><div class="line">make</div><div class="line">make test</div></pre></td></tr></table></figure>
 <p>资源有限，单机部署，原理是一样的</p>
