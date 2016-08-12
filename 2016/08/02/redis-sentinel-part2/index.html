@@ -90,7 +90,8 @@ ok
 sdown 主观下线
 odown 客观下线
 
-master elected">
+master elected可能遇到的坑
+Sentinel + Redis distributed system does not guarantee that acknowledged writes are retained during failures, since Redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis Sentinel（二）进阶">
 <meta property="og:url" content="https://monkeyissexy.github.io/2016/08/02/redis-sentinel-part2/index.html">
@@ -101,8 +102,9 @@ ok
 sdown 主观下线
 odown 客观下线
 
-master elected">
-<meta property="og:updated_time" content="2016-08-07T03:24:14.000Z">
+master elected可能遇到的坑
+Sentinel + Redis distributed system does not guarantee that acknowledged writes are retained during failures, since Redis">
+<meta property="og:updated_time" content="2016-08-10T12:15:33.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis Sentinel（二）进阶">
 <meta name="twitter:description" content="failover在sentinel中，master状态有三种
@@ -111,7 +113,8 @@ ok
 sdown 主观下线
 odown 客观下线
 
-master elected">
+master elected可能遇到的坑
+Sentinel + Redis distributed system does not guarantee that acknowledged writes are retained during failures, since Redis">
 
 
 
@@ -356,7 +359,10 @@ master elected">
 <li>sdown 主观下线</li>
 <li>odown 客观下线</li>
 </ul>
-<h3 id="master-elected"><a href="#master-elected" class="headerlink" title="master elected"></a>master elected</h3>
+<h2 id="master-elected"><a href="#master-elected" class="headerlink" title="master elected"></a>master elected</h2><h2 id="可能遇到的坑"><a href="#可能遇到的坑" class="headerlink" title="可能遇到的坑"></a>可能遇到的坑</h2><blockquote>
+<p>Sentinel + Redis distributed system does not guarantee that acknowledged writes are retained during failures, since Redis uses asynchronous replication. However there are ways to deploy Sentinel that make the window to lose writes limited to certain moments, while there are other less secure ways to deploy it.</p>
+</blockquote>
+<h2 id="一套sentinel集群，可以监控多个redis集群"><a href="#一套sentinel集群，可以监控多个redis集群" class="headerlink" title="一套sentinel集群，可以监控多个redis集群"></a>一套sentinel集群，可以监控多个redis集群</h2>
       
     </div>
 
@@ -389,7 +395,7 @@ master elected">
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/08/02/redis-sentinel/" rel="prev" title="Redis Sentinel（一）入门">
+              <a href="/2016/08/10/redis-sentinel-part1/" rel="prev" title="Redis Sentinel（一）入门">
                 Redis Sentinel（一）入门 <i class="fa fa-chevron-right"></i>
               </a>
             
@@ -531,7 +537,7 @@ master elected">
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#failover"><span class="nav-number">1.</span> <span class="nav-text">failover</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#master-elected"><span class="nav-number">1.1.</span> <span class="nav-text">master elected</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#failover"><span class="nav-number">1.</span> <span class="nav-text">failover</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#master-elected"><span class="nav-number">2.</span> <span class="nav-text">master elected</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可能遇到的坑"><span class="nav-number">3.</span> <span class="nav-text">可能遇到的坑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一套sentinel集群，可以监控多个redis集群"><span class="nav-number">4.</span> <span class="nav-text">一套sentinel集群，可以监控多个redis集群</span></a></li></ol></div>
             
           </div>
         </section>

@@ -102,7 +102,7 @@ nginx
 执行命令
 
 12345开发/测试	nginx	验证	ps -ef|grep nginx">
-<meta property="og:updated_time" content="2016-08-06T06:52:13.000Z">
+<meta property="og:updated_time" content="2016-08-12T06:35:47.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="断电重启教程">
 <meta name="twitter:description" content="断电重启教程
@@ -364,7 +364,7 @@ nginx
 <blockquote>
 <p>执行命令</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">开发</div><div class="line">	/root/software/redis-3.0.7/src/redis-server	/root/software/redis-3.0.7/redis.conf  </div><div class="line">	</div><div class="line">测试</div><div class="line">	redis-server /etc/redis.conf	</div><div class="line">	</div><div class="line">验证</div><div class="line">	telnet localhost 6379</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">开发</div><div class="line">	/root/software/redis_ha/redis-2.8.24/src/redis-server /root/software/redis_ha/redis-2.8.24/redis_6377.conf</div><div class="line">	/root/software/redis_ha/redis-2.8.24/src/redis-server /root/software/redis_ha/redis-2.8.24/redis_6378.conf</div><div class="line">	/root/software/redis_ha/redis-2.8.24/src/redis-server /root/software/redis_ha/redis-2.8.24/redis_6379.conf</div><div class="line"></div><div class="line">	/root/software/redis_ha/redis-2.8.24/src/redis-sentinel /root/software/redis_ha/redis-2.8.24/sentinel_6377.conf</div><div class="line">	/root/software/redis_ha/redis-2.8.24/src/redis-sentinel /root/software/redis_ha/redis-2.8.24/sentinel_6378.conf</div><div class="line">	/root/software/redis_ha/redis-2.8.24/src/redis-sentinel /root/software/redis_ha/redis-2.8.24/sentinel_6379.conf</div><div class="line"> </div><div class="line">	</div><div class="line">测试</div><div class="line">	/data/redis_ha/redis6377/src/redis-server /data/redis_ha/redis6377/redis.conf</div><div class="line">	/data/redis_ha/redis6378/src/redis-server /data/redis_ha/redis6378/redis.conf</div><div class="line">	/data/redis_ha/redis6379/src/redis-server /data/redis_ha/redis6379/redis.conf</div><div class="line"></div><div class="line">	/data/redis_ha/redis6377/src/redis-sentinel /data/redis_ha/redis6377/sentinel.conf</div><div class="line">	/data/redis_ha/redis6378/src/redis-sentinel /data/redis_ha/redis6378/sentinel.conf</div><div class="line">	/data/redis_ha/redis6379/src/redis-sentinel /data/redis_ha/redis6379/sentinel.conf	</div><div class="line">	</div><div class="line">验证</div><div class="line">	telnet localhost 6379	</div><div class="line">	telnet localhost 26379</div></pre></td></tr></table></figure>
 <ul>
 <li>kestrel</li>
 </ul>
