@@ -96,7 +96,7 @@ quorum
 
 quorum
 状态">
-<meta property="og:updated_time" content="2016-08-14T11:02:25.000Z">
+<meta property="og:updated_time" content="2016-08-14T11:04:12.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis Sentinel（二）进阶">
 <meta name="twitter:description" content="本篇来说下failover，过程比较有意思，不过为了易于理解，在说明之前，需要sentinel中这两个概念给说明一下：
@@ -395,7 +395,7 @@ quorum
 <blockquote>
 <p>注：<br>如果部署了5个sentinel集群，quorum设定为2，当master odown之后，将从这两个sentinel中，选择一个来执行failover，那么按照上面的说法，failover又必须得到大多数sentinel agree，即：必须至少需要3个或3个以上的sentinel同意，那么failover操作才能被授权执行；</p>
 </blockquote>
-<p>这里用到的<code>gossip</code>协议，没错，与<code>zookeeper</code>用的协议，接下来我会再写一篇关于gossip协议的文章；</p>
+<p>这里用到的<code>gossip</code>协议，没错，同<code>zookeeper</code>用的协议，接下来我会再写一篇关于gossip协议的文章；</p>
 <p>同时，gossip也决定了集群的部署结构：<code>2n+1</code>（n&gt;=1），所以redis和zookeeper官方要求一个健壮的高可用集群至少要部署3个实例，且为必须要部署到3个独立机器上；</p>
 <h3 id="一些坑"><a href="#一些坑" class="headerlink" title="一些坑"></a>一些坑</h3><h4 id="坑一：丢数据"><a href="#坑一：丢数据" class="headerlink" title="坑一：丢数据"></a>坑一：丢数据</h4><p>failover过程中丢数据</p>
 <h5 id="如何发生的："><a href="#如何发生的：" class="headerlink" title="如何发生的："></a>如何发生的：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">         +----+</div><div class="line">         | M1 |</div><div class="line">         | S1 | &lt;- C1 (writes will be lost)</div><div class="line">         +----+</div><div class="line">            |</div><div class="line">            /</div><div class="line">            /</div><div class="line">+------+    |    +----+</div><div class="line">| [M2] |----+----| R3 |</div><div class="line">| S2   |         | S3 |</div><div class="line">+------+         +----+</div></pre></td></tr></table></figure>
