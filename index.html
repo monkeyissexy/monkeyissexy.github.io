@@ -265,8 +265,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/08/10/redis-sentinel-part1/" itemprop="url">
-                  Redis Sentinel（一）入门
+                <a class="post-title-link" href="/2016/08/14/redis-sentinel-part2/" itemprop="url">
+                  Redis Sentinel（二）进阶
                 </a>
               
             
@@ -279,8 +279,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-10T20:10:17+08:00" content="2016-08-10">
-              2016-08-10
+            <time itemprop="dateCreated" datetime="2016-08-14T17:58:17+08:00" content="2016-08-14">
+              2016-08-14
             </time>
           </span>
 
@@ -309,8 +309,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/10/redis-sentinel-part1/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/10/redis-sentinel-part1/" itemprop="commentsCount"></span>
+                <a href="/2016/08/14/redis-sentinel-part2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/14/redis-sentinel-part2/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -334,12 +334,13 @@
 
       
         
-          <h2 id="redis-sentinel-2-8-x-搭建"><a href="#redis-sentinel-2-8-x-搭建" class="headerlink" title="redis sentinel (2.8.x)搭建"></a>redis sentinel (2.8.x)搭建</h2><blockquote>
-<p>本来使用的是最新稳定版3.2.2，这个版本对redis的安全性方面，也做了很多改进，但是在搭建好之后，连接sentinel的时候，出现和protected-mode相关的问题，google了下没有解决，所以讲版本降低到2.8.24版本进行测试。2.8.x版本中sentinel2已经是稳定版了，所以不影响演示，等有时间了把3.2.2的那个问题给解决了，再更新。。。</p>
-</blockquote>
-<h3 id="入门搭建演示"><a href="#入门搭建演示" class="headerlink" title="入门搭建演示"></a>入门搭建演示</h3><p>好了，让我们开始吧！</p>
+          <p>本篇来说下failover，过程比较有意思，不过为了易于理解，在说明之前，需要sentinel中这两个概念给说明一下：</p>
+<ul>
+<li>quorum</li>
+<li>状态</li>
+</ul>
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/08/10/redis-sentinel-part1/#more" rel="contents">
+            <a class="btn" href="/2016/08/14/redis-sentinel-part2/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -390,8 +391,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/08/02/redis-sentinel-part2/" itemprop="url">
-                  Redis Sentinel（二）进阶
+                <a class="post-title-link" href="/2016/08/06/redis-sentinel-part1/" itemprop="url">
+                  Redis Sentinel（一）入门
                 </a>
               
             
@@ -404,8 +405,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-02T19:58:17+08:00" content="2016-08-02">
-              2016-08-02
+            <time itemprop="dateCreated" datetime="2016-08-06T14:10:17+08:00" content="2016-08-06">
+              2016-08-06
             </time>
           </span>
 
@@ -434,8 +435,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/02/redis-sentinel-part2/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/02/redis-sentinel-part2/" itemprop="commentsCount"></span>
+                <a href="/2016/08/06/redis-sentinel-part1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/06/redis-sentinel-part1/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -459,18 +460,15 @@
 
       
         
-          
-            <h2 id="failover"><a href="#failover" class="headerlink" title="failover"></a>failover</h2><p>在sentinel中，master状态有三种</p>
-<ul>
-<li>ok</li>
-<li>sdown 主观下线</li>
-<li>odown 客观下线</li>
-</ul>
-<h2 id="master-elected"><a href="#master-elected" class="headerlink" title="master elected"></a>master elected</h2><h2 id="可能遇到的坑"><a href="#可能遇到的坑" class="headerlink" title="可能遇到的坑"></a>可能遇到的坑</h2><blockquote>
-<p>Sentinel + Redis distributed system does not guarantee that acknowledged writes are retained during failures, since Redis uses asynchronous replication. However there are ways to deploy Sentinel that make the window to lose writes limited to certain moments, while there are other less secure ways to deploy it.</p>
+          <h2 id="redis-sentinel-2-8-x-搭建"><a href="#redis-sentinel-2-8-x-搭建" class="headerlink" title="redis sentinel (2.8.x)搭建"></a>redis sentinel (2.8.x)搭建</h2><blockquote>
+<p>本来使用的是最新稳定版3.2.2，这个版本对redis的安全性方面，也做了很多改进，但是在搭建好之后，连接sentinel的时候，出现和protected-mode相关的问题，google了下没有解决，所以讲版本降低到2.8.24版本进行测试。2.8.x版本中sentinel2已经是稳定版了，所以不影响演示，等有时间了把3.2.2的那个问题给解决了，再更新。。。</p>
 </blockquote>
-<h2 id="一套sentinel集群，可以监控多个redis集群"><a href="#一套sentinel集群，可以监控多个redis集群" class="headerlink" title="一套sentinel集群，可以监控多个redis集群"></a>一套sentinel集群，可以监控多个redis集群</h2>
-          
+<h3 id="入门搭建演示"><a href="#入门搭建演示" class="headerlink" title="入门搭建演示"></a>入门搭建演示</h3><p>好了，让我们开始吧！</p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/06/redis-sentinel-part1/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>

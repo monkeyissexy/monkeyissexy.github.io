@@ -1,0 +1,751 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="本篇来说下failover，过程比较有意思，不过为了易于理解，在说明之前，需要sentinel中这两个概念给说明一下：
+
+quorum
+状态">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis Sentinel（二）进阶">
+<meta property="og:url" content="https://monkeyissexy.github.io/2016/08/14/redis-sentinel-part2/index.html">
+<meta property="og:site_name" content="Monkey is Sexy!">
+<meta property="og:description" content="本篇来说下failover，过程比较有意思，不过为了易于理解，在说明之前，需要sentinel中这两个概念给说明一下：
+
+quorum
+状态">
+<meta property="og:updated_time" content="2016-08-14T11:02:25.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis Sentinel（二）进阶">
+<meta name="twitter:description" content="本篇来说下failover，过程比较有意思，不过为了易于理解，在说明之前，需要sentinel中这两个概念给说明一下：
+
+quorum
+状态">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://monkeyissexy.github.io/2016/08/14/redis-sentinel-part2/"/>
+
+  <title> Redis Sentinel（二）进阶 | Monkey is Sexy! </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?e3eaf9cb0e468d1de706431e5cafa74f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Monkey is Sexy!</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis Sentinel（二）进阶
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-14T17:58:17+08:00" content="2016-08-14">
+              2016-08-14
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/14/redis-sentinel-part2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/14/redis-sentinel-part2/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇来说下failover，过程比较有意思，不过为了易于理解，在说明之前，需要sentinel中这两个概念给说明一下：</p>
+<ul>
+<li>quorum</li>
+<li>状态</li>
+</ul>
+<a id="more"></a>
+<h3 id="quorum"><a href="#quorum" class="headerlink" title="quorum"></a>quorum</h3><p>通常情况下，一个健壮的sentinel集群，最低配置为3个实例，且这个三个实例应当部署在独立的机器上，这也是官方强烈建议的部署方案；</p>
+<blockquote>
+<p>‘You need at least three Sentinel instances for a robust deployment.’<br>‘So please deploy at least three Sentinels in three different boxes always.’</p>
+</blockquote>
+<p><code>sentinel.conf</code>中有一个<code>monitor</code>配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sentinel monitor &lt;master-group-name&gt; &lt;ip&gt; &lt;port&gt; &lt;quorum&gt;</div></pre></td></tr></table></figure>
+<p>其中最后一个option字段为<code>quorum</code>，翻译过来是<code>法定人数</code>的意思，这个配置在决定执行failover前，起着重要的作用。</p>
+<p>以下是<a href="http://redis.io/topics/sentinel" target="_blank" rel="external">Sentinel官方文档</a>中，对quorum的说明：</p>
+<blockquote>
+<p>官方文档：</p>
+<ol>
+<li>The quorum is the number of Sentinels that need to agree about the fact the master is not reachable, in order for really mark the slave as failing, and eventually start a fail over procedure if possible.</li>
+<li>However the quorum is only used to detect the failure. In order to actually perform a failover, one of the Sentinels need to be elected leader for the failover and be authorized to proceed. This only happens with the vote of the majority of the Sentinel processes.</li>
+</ol>
+</blockquote>
+<p>总结一下：</p>
+<ul>
+<li>quorum用作对客观事实的判定；</li>
+<li>将从quorum中选择一个实例，这个实例在取得大多数sentinel同意的情况下，才能被授权执行failover；</li>
+</ul>
+<h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><p>sentinel只监听master的运行情况，master在sentinel中有三种状态:</p>
+<blockquote>
+<p>我们不需要显示的配置slaves地址信息，sentinel通过对master的info命令，能自动发现到它的slaves，并将slaves信息记录下来；</p>
+</blockquote>
+<ul>
+<li>ok</li>
+<li>sdown 主观下线</li>
+<li>odown 客观下线</li>
+</ul>
+<p>状态的流转情况，如下所示：<br><code>ok -&gt; sdown -&gt; odown -&gt; ok</code></p>
+<p>在正常情况下，master在sentinel中是<code>ok</code>状态；</p>
+<p>如有异常情况，如：网络中断、master实例挂了等等，导致在指定时间之内<code>sentinel down-after-milliseconds mymaster 60000</code>，sentinel还是无法<code>PING</code>通master或者<code>PING</code>命令的响应不是正常情况的话，那么sentinel就会主观上认为当前master挂了，并在当前sentinel上，将master状态标记为：<code>sdown</code>状态；</p>
+<blockquote>
+<p>sdown是subjective down的缩写，即：主观下线</p>
+</blockquote>
+<p>当有<code>quorum</code>个sentinel都主观上认为master为<code>sdown</code>后，sentinel中master的状态就会变成<code>odown</code>。此时，master down了就成为了大家公认的客观事实了；</p>
+<blockquote>
+<p>odown是objective down的缩写，即：客观下线</p>
+</blockquote>
+<h3 id="举例说明"><a href="#举例说明" class="headerlink" title="举例说明"></a>举例说明</h3><p>上文<a href="https://monkeyissexy.github.io/2016/08/10/redis-sentinel-part1/">Redis Sentinel（一）入门</a>中，我们部署了三个sentinel实例，设定的法人数量为2，那么failover的过程是这样的：</p>
+<ul>
+<li>当master挂了之后，三个sentinel在指定时间内，都不能ping通master，那么这个master在三个sentinel中的状态就是主观下线<code>sdown</code>了；</li>
+<li>当有2个法人（sentinel）主观认定master下线后，那么master挂了的这件事情就成为客观事实，此时master在三个sentinel钟的状态为<code>odown</code>；</li>
+<li>此时，将会触发failover，从这两个sentinel中选择一个来执行failover，但是failover又必须得到大多数sentinel的授权才可以，在这个例子中，需要&gt;=2个sentinel的授权才可以；</li>
+</ul>
+<blockquote>
+<p>注：<br>如果部署了5个sentinel集群，quorum设定为2，当master odown之后，将从这两个sentinel中，选择一个来执行failover，那么按照上面的说法，failover又必须得到大多数sentinel agree，即：必须至少需要3个或3个以上的sentinel同意，那么failover操作才能被授权执行；</p>
+</blockquote>
+<p>这里用到的<code>gossip</code>协议，没错，与<code>zookeeper</code>用的协议，接下来我会再写一篇关于gossip协议的文章；</p>
+<p>同时，gossip也决定了集群的部署结构：<code>2n+1</code>（n&gt;=1），所以redis和zookeeper官方要求一个健壮的高可用集群至少要部署3个实例，且为必须要部署到3个独立机器上；</p>
+<h3 id="一些坑"><a href="#一些坑" class="headerlink" title="一些坑"></a>一些坑</h3><h4 id="坑一：丢数据"><a href="#坑一：丢数据" class="headerlink" title="坑一：丢数据"></a>坑一：丢数据</h4><p>failover过程中丢数据</p>
+<h5 id="如何发生的："><a href="#如何发生的：" class="headerlink" title="如何发生的："></a>如何发生的：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">         +----+</div><div class="line">         | M1 |</div><div class="line">         | S1 | &lt;- C1 (writes will be lost)</div><div class="line">         +----+</div><div class="line">            |</div><div class="line">            /</div><div class="line">            /</div><div class="line">+------+    |    +----+</div><div class="line">| [M2] |----+----| R3 |</div><div class="line">| S2   |         | S3 |</div><div class="line">+------+         +----+</div></pre></td></tr></table></figure>
+<p>当M1所在机器与另外两台机器的网络中断，则s2和s3 sentinel满足failover条件，准备进行failover，但同时，可能还有client正连接到旧的master，而导致数据丢失：</p>
+<ul>
+<li>数据已经写入到旧master，而failover完成之后，旧master会被sentinel设置为slave，将重新与新的master进行数据复制，自生的数据会丢失掉；</li>
+</ul>
+<blockquote>
+<p>官方文档：<br>In this case a network partition isolated the old master M1, so the slave R2 is promoted to master. However clients, like C1, that are in the same partition as the old master, may continue to write data to the old master. This data will be lost forever since when the partition will heal, the master will be reconfigured as a slave of the new master, discarding its data set.</p>
+</blockquote>
+<h5 id="怎么解决："><a href="#怎么解决：" class="headerlink" title="怎么解决："></a>怎么解决：</h5><p>这个问题无法解决，只能减缓，使用redis replication配置：</p>
+<blockquote>
+<p>官方文档：<br>This problem can be mitigated using the following Redis replication feature, that allows to stop accepting writes if a master detects that is no longer able to transfer its writes to the specified number of slaves. </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">min-slaves-to-write 1</div><div class="line">min-slaves-max-lag 10</div></pre></td></tr></table></figure>
+<p>什么意思呢？在向master进行write操作时，需要检查master和slaves的连接情况，只要有1个slave连接正常，write操作才给执行；如果连1个slave都没有正常连接，那么master将罢工10s，在这10s内，master不接受任何write操作；</p>
+<blockquote>
+<p>官方文档：</p>
+<ul>
+<li>With the above configuration (please see the self-commented redis.conf example in the Redis distribution for more information) a Redis instance, when acting as a master, will stop accepting writes if it can’t write to at least 1 slave. Since replication is asynchronous not being able to write actually means that the slave is either disconnected, or is not sending us asynchronous acknowledges for more than the specified max-lag number of seconds.</li>
+<li>Using this configuration the old Redis master M1 in the above example, will become unavailable after 10 seconds. When the partition heals, the Sentinel configuration will converge to the new one, the client C1 will be able to fetch a valid configuration and will continue with the new master.</li>
+<li>However there is no free lunch. With this refinement, if the two slaves are down, the master will stop accepting writes. It’s a trade off.</li>
+</ul>
+</blockquote>
+<h5 id="怎么面对："><a href="#怎么面对：" class="headerlink" title="怎么面对："></a>怎么面对：</h5><pre><code>1. 如果是把redis当作缓存来用，则大可不用去在意这件事情，也不需要进行如上的配置，仅仅多了一次miss而已；
+2. 如果是把redis当做一个存储来使用，那么还没有好的方案来做，目前只能通过上面的replication的配置来减缓，写入失败就抛错，可能对用户体验不佳，但对数据来说是安全的，不过需要注意的是，这种方式可能引起另一严重问题，当两个slave都挂了，那么整个redis集群就不能使用了；
+</code></pre><p>目前我所在的系统，用redis做登录用户的token存储，权衡之下，没有进行如上的配置，理由如下：</p>
+<pre><code>1. 概率小；
+2. 防止造成更大的问题；
+</code></pre><h4 id="坑二：六神无主"><a href="#坑二：六神无主" class="headerlink" title="坑二：六神无主"></a>坑二：六神无主</h4><p>failover成功之前，若将旧master启动，会造成六神无主的情况，这种情况我自己没有测试，是网友测试的，还有待验证；</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/06/redis-sentinel-part1/" rel="next" title="Redis Sentinel（一）入门">
+                <i class="fa fa-chevron-left"></i> Redis Sentinel（一）入门
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/14/redis-sentinel-part2/"
+           data-title="Redis Sentinel（二）进阶" data-url="https://monkeyissexy.github.io/2016/08/14/redis-sentinel-part2/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="hongliang wang" />
+          <p class="site-author-name" itemprop="name">hongliang wang</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/monkeyissexy" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        <div class="links-of-author motion-element">
+            
+                <p class="site-author-name">友情链接</p>
+                
+                    <span class="links-of-author-item">
+                    <a href="https://elephantme.github.io/" target="_blank">Elephant Me</a>
+                    </span>
+                
+            
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#quorum"><span class="nav-number">1.</span> <span class="nav-text">quorum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#状态"><span class="nav-number">2.</span> <span class="nav-text">状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#举例说明"><span class="nav-number">3.</span> <span class="nav-text">举例说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一些坑"><span class="nav-number">4.</span> <span class="nav-text">一些坑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#坑一：丢数据"><span class="nav-number">4.1.</span> <span class="nav-text">坑一：丢数据</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#如何发生的："><span class="nav-number">4.1.1.</span> <span class="nav-text">如何发生的：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#怎么解决："><span class="nav-number">4.1.2.</span> <span class="nav-text">怎么解决：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#怎么面对："><span class="nav-number">4.1.3.</span> <span class="nav-text">怎么面对：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#坑二：六神无主"><span class="nav-number">4.2.</span> <span class="nav-text">坑二：六神无主</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a href="/">Monkey is Sexy!</a></span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"monkeyissexy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
