@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="angularjs,requirejs,karma,jasmine," />
 
 
 
@@ -84,18 +84,30 @@
 
 
 
-<meta name="description" content="架构图">
+<meta name="description" content="前言作为服务端开发人员，Java的单元测试我们都了解，但是本文我们要来探讨关于JavaScript的单元测试。
+
+你要问我为什么突然会写前端的博文，因为公司近期安排的分享任务-angularjs ut，正好赶上了。。。其实和angularjs spa相关开发，我也做过一段时间。对此还是有些兴趣的，毕竟无论前端后端，技术思想基本是想通的。只是前端技术这两年发展的太迅猛，有点跟不上了。
+
+本文大致思路">
 <meta property="og:type" content="article">
-<meta property="og:title" content="某系统架构">
-<meta property="og:url" content="https://monkeyissexy.github.io/2016/07/15/architecture-one/index.html">
+<meta property="og:title" content="JavaScript Unit Test in RequireJs and AngularJs with Karma + Jasmine">
+<meta property="og:url" content="https://monkeyissexy.github.io/2016/08/17/karma_jasmine_with_requirejs_angularjs/index.html">
 <meta property="og:site_name" content="Monkey is Sexy!">
-<meta property="og:description" content="架构图">
-<meta property="og:image" content="https://raw.githubusercontent.com/monkeyissexy/attachment/master/images/paymax.png">
-<meta property="og:updated_time" content="2016-08-06T06:48:39.000Z">
+<meta property="og:description" content="前言作为服务端开发人员，Java的单元测试我们都了解，但是本文我们要来探讨关于JavaScript的单元测试。
+
+你要问我为什么突然会写前端的博文，因为公司近期安排的分享任务-angularjs ut，正好赶上了。。。其实和angularjs spa相关开发，我也做过一段时间。对此还是有些兴趣的，毕竟无论前端后端，技术思想基本是想通的。只是前端技术这两年发展的太迅猛，有点跟不上了。
+
+本文大致思路">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/directory_arc.png">
+<meta property="og:updated_time" content="2016-08-17T12:06:30.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="某系统架构">
-<meta name="twitter:description" content="架构图">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/monkeyissexy/attachment/master/images/paymax.png">
+<meta name="twitter:title" content="JavaScript Unit Test in RequireJs and AngularJs with Karma + Jasmine">
+<meta name="twitter:description" content="前言作为服务端开发人员，Java的单元测试我们都了解，但是本文我们要来探讨关于JavaScript的单元测试。
+
+你要问我为什么突然会写前端的博文，因为公司近期安排的分享任务-angularjs ut，正好赶上了。。。其实和angularjs spa相关开发，我也做过一段时间。对此还是有些兴趣的，毕竟无论前端后端，技术思想基本是想通的。只是前端技术这两年发展的太迅猛，有点跟不上了。
+
+本文大致思路">
+<meta name="twitter:image" content="https://monkeyissexy.github.io/images/directory_arc.png">
 
 
 
@@ -116,9 +128,9 @@
 
 
 
-  <link rel="canonical" href="https://monkeyissexy.github.io/2016/07/15/architecture-one/"/>
+  <link rel="canonical" href="https://monkeyissexy.github.io/2016/08/17/karma_jasmine_with_requirejs_angularjs/"/>
 
-  <title> 某系统架构 | Monkey is Sexy! </title>
+  <title> JavaScript Unit Test in RequireJs and AngularJs with Karma + Jasmine | Monkey is Sexy! </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -268,7 +280,7 @@
             
             
               
-                某系统架构
+                JavaScript Unit Test in RequireJs and AngularJs with Karma + Jasmine
               
             
           </h1>
@@ -280,8 +292,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-15T15:51:17+08:00" content="2016-07-15">
-              2016-07-15
+            <time itemprop="dateCreated" datetime="2016-08-17T19:21:00+08:00" content="2016-08-17">
+              2016-08-17
             </time>
           </span>
 
@@ -294,8 +306,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/architecture/" itemprop="url" rel="index">
-                    <span itemprop="name">architecture</span>
+                  <a href="/categories/javascript/" itemprop="url" rel="index">
+                    <span itemprop="name">javascript</span>
                   </a>
                 </span>
 
@@ -310,8 +322,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/07/15/architecture-one/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/15/architecture-one/" itemprop="commentsCount"></span>
+                <a href="/2016/08/17/karma_jasmine_with_requirejs_angularjs/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/17/karma_jasmine_with_requirejs_angularjs/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -334,142 +346,51 @@
       
 
       
-        <h2 id="架构图"><a href="#架构图" class="headerlink" title="架构图"></a>架构图</h2><p><img src="https://raw.githubusercontent.com/monkeyissexy/attachment/master/images/paymax.png" alt="架构图"></p>
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>作为服务端开发人员，Java的单元测试我们都了解，但是本文我们要来探讨关于JavaScript的单元测试。</p>
+<blockquote>
+<p>你要问我为什么突然会写前端的博文，因为公司近期安排的分享任务-angularjs ut，正好赶上了。。。其实和angularjs spa相关开发，我也做过一段时间。对此还是有些兴趣的，毕竟无论前端后端，技术思想基本是想通的。只是前端技术这两年发展的太迅猛，有点跟不上了。</p>
+</blockquote>
+<p>本文大致思路：</p>
+<ul>
+<li>相关工具的简单介绍；</li>
+<li>集成说明；</li>
+<li>提供一个Demo；</li>
+</ul>
+<p>karma的网站上只有karma+requirejs的介绍，而我们公司是requirejs+angularjs架构的，无耐网上关于karma+requirejs+angularjs的集成介绍文档少之又少，我在集成的时候，也调试了很久才跑起来的。。。都是泪啊，所以今天写下这一篇，方便跟我一样的后来者。</p>
+<h3 id="名词"><a href="#名词" class="headerlink" title="名词"></a>名词</h3><p>本文中，我们会讲到几个名词，先罗列一下：</p>
+<ul>
+<li>Karma</li>
+<li>Jasmine</li>
+<li>Angularjs</li>
+<li>Requirejs</li>
+<li>bower</li>
+<li>npm</li>
+</ul>
 <a id="more"></a>
-<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p>本系统架构，是以实现一个高可用、可伸缩性强、用户体验佳、安全性好为目标而设计的。</p>
-<h2 id="各层说明"><a href="#各层说明" class="headerlink" title="各层说明"></a>各层说明</h2><h3 id="前端层"><a href="#前端层" class="headerlink" title="前端层"></a>前端层</h3><blockquote>
-<p>WEB、MOBILE、MERCHANT（商户服务器）</p>
-</blockquote>
-<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul>
-<li>提升开发效率</li>
-<li>结构清晰</li>
-<li>可读性强</li>
-<li>可维护性强</li>
-<li>前后端充分解耦</li>
-<li>利于页面的加载优化</li>
-</ul>
-<p>WEB/MOBILE模块层，为纯js、css、html（angularjs+requirejs）架构，与服务器交互使用restful api接口；</p>
-<p>采用angularjs+requirejs前端js框架，在提升开发效率的同时，使得前端代码结构分明、清晰、可读性强，增加前端代码的可维护性，这是传统页面无法做到的。</p>
-<p>同时，这种方式有助于前后端充分解耦，完全面向restful接口开，使得前后端开发人员剥离开，与传统的jsp相比，前端开发不需要参和后端服务器代码，更纯粹、更专注；</p>
-<p>另外这种纯静态的结构，借助CDN可大大提高页面加载速度，提升用户提现；</p>
-<h3 id="API层"><a href="#API层" class="headerlink" title="API层"></a>API层</h3><blockquote>
-<p>API（为商户后台提供接口）、MERCHANT-API（为商户提供交易接口）</p>
-</blockquote>
-<p>这两个API模块都采用了Restful接口规范，均使用SSL保证通信安全：</p>
-<ul>
-<li>安全性<ul>
-<li>API 采用Oauth2.0标准协议，确保了接口安全性；</li>
-<li>MERCHANT-API 采用双向非对称加密，确保了接口安全；</li>
-</ul>
-</li>
-<li>高可用：前端采用SLB(阿里负载均衡)，服务器内部使用nginx做反向代理；</li>
-<li>缓存：REST设计的一个原则为有效利用缓存，所有POST、PUT和DELETE请求均不缓存，这一点由浏览器自身保证，无需额外的配置。对于GET请求，必须合理地配置缓存头，从而提高部分接口的响应效率；</li>
-</ul>
-<h3 id="业务层"><a href="#业务层" class="headerlink" title="业务层"></a>业务层</h3><blockquote>
-<p>所有业务逻辑都在这里</p>
-</blockquote>
-<ul>
-<li>交易回调：处理各第三方支付系统的回调；</li>
-<li>BUSINESS：串联所有基础服务模块，通过Dubbo连接（下面中间件会介绍）；</li>
-<li>微信网关：处理所有与微信接口的调用；</li>
-<li>后台：内部运营管理后台；</li>
-</ul>
-<h3 id="基础服务层"><a href="#基础服务层" class="headerlink" title="基础服务层"></a>基础服务层</h3><blockquote>
-<p>微服务架构（MSA）是一种架构概念，旨在通过将功能分解到各个离散的服务中以实现对解决方案的解耦，基础服务层之间，不直接调用，通过可靠的MQ来通信（下面中间件会介绍）；</p>
-</blockquote>
-<ul>
-<li><p>用户服务</p>
-<p>   提供用户相关基础逻辑接口，登录、注册等等；</p>
-</li>
-<li><p>订单模块</p>
-<p>  处理所有订单交易相关逻辑接口，提供查询接口、统计接口；</p>
-</li>
-<li><p>渠道模块</p>
-<p>  连接外部各种第三方支付系统，内部与订单模块交互；</p>
-</li>
-<li><p>账单模块</p>
-<p>  提供下载、存储所有商户在paymax的交易账单；</p>
-</li>
-<li><p>门店模块</p>
-<p>  提供所有门店系统相关接口；</p>
-</li>
-<li><p>商户服务</p>
-<p>  包含商户接入信息、资料等相关接口；</p>
-</li>
-<li><p>购物车模块</p>
-<p>  商户可在购物车下单购买所需要的渠道；</p>
-</li>
-<li><p>消息模块</p>
-<p>  提供sms、email发通知的功能；</p>
-</li>
-<li><p>api模块</p>
-<p>  提供商户后台接口，接口安全使用oauth；</p>
-</li>
-<li><p>merchant-api模块</p>
-<p>  提供交易相关接口，供商户服务器调用；</p>
-</li>
-</ul>
-<h3 id="中间件层"><a href="#中间件层" class="headerlink" title="中间件层"></a>中间件层</h3><blockquote>
-<p>ZOOKEEPER、REDIS、RDS、OSS、DUBBO、MQ</p>
-</blockquote>
-<ul>
-<li>Zookeeper</li>
-</ul>
+<h3 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h3><p><img src="/images/directory_arc.png" alt="结构图"></p>
+<p>好了，让我们开始吧~</p>
 <blockquote>
-<p>ZooKeeper是一个高可用的分布式数据管理与系统协调框架。基于对Paxos算法的实现，使该框架保证了分布式环境中数据的强一致性</p>
+<p>假设前提，你已经了解requirejs和angularjs，并且机器上已安装node。<br>OK，让我们开始学习基于requirejs和angularjs的单元测试如何配置的。</p>
 </blockquote>
-<p>使用zookeeper来处理分布式系统之间的协作，同时也保证了系统的一致性；</p>
-<ul>
-<li>Redis</li>
-</ul>
+<p>首先，先了解下Jasmine</p>
+<h3 id="Jasmine"><a href="#Jasmine" class="headerlink" title="Jasmine"></a>Jasmine</h3><blockquote>
+<p>jasmine 英  [‘dʒæzmɪn; ‘dʒæs-]   美  [‘dʒæzmɪn]<br>茉莉</p>
+</blockquote>
+<p><a href="http://jasmine.github.io/2.0/introduction.html" target="_blank" rel="external">官方文档</a>中对它的说明：</p>
 <blockquote>
-<p>配合zookeeper的leader模式，开发出高可用的redis集群，保证了系统的稳定；</p>
+<p>Jasmine is a behavior-driven development framework for testing JavaScript code.  – Jasmine是一个面向JavaScript的行为驱动开发测试框架<a href="https://zh.wikipedia.org/wiki/%E8%A1%8C%E4%B8%BA%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91" target="_blank" rel="external">(BDD)</a>。</p>
 </blockquote>
-<p>在系统中主要是提供了高可用的内存缓存角色，从而大大提高了系统效率；</p>
-<ul>
-<li><p>RDS</p>
-<p>  使用的是阿里高可用的mysql，很好的解决了单点故障等问题；</p>
-</li>
-<li><p>OSS</p>
-<p>  分布式文件存储系统，高可用；也利于做CDN优化加载，提升用户体验；</p>
-</li>
-<li><p>DUBBO</p>
-</li>
-</ul>
+<p>总结一下：类似于java里的junit测试框架，写一些case和断言，它不依赖任何的框架，可以测试任何的js代码；</p>
+<h3 id="karma"><a href="#karma" class="headerlink" title="karma"></a>karma</h3><blockquote>
+<p>karma 英  [‘kɑːmə; ‘kɜːmə] 美  [‘kɑrmə]<br>因果报应，因缘</p>
+</blockquote>
+<p>可以用它在多个真实的浏览器上执行js代码，当然也包括js的单元测试（单元测试也是代码）；</p>
+<p><a href="https://github.com/karma-runner/karma" target="_blank" rel="external">官方文档</a>中对它的描述：</p>
 <blockquote>
-<p>DUBBO是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案。</p>
+<p>A simple tool that allows you to execute JavaScript code in multiple real browsers.</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">透明：使得RPC接口管理变得透明；</div><div class="line">伸缩性：系统平行扩展很方便，可以根据业务量，很简单的弹性上下架服务实例；</div><div class="line">监控：可对接口的调用做监控，次数、效率等等，对暴露的问题提前优化；</div></pre></td></tr></table></figure>
-<ul>
-<li>MQ</li>
-</ul>
-<blockquote>
-<p>使用了可靠的消息队列，添加了ack机制及发送策略；</p>
-</blockquote>
-<p>使得系统间解耦，可靠消息机制，也保证了系统间数据的一致性；</p>
-<h3 id="监控"><a href="#监控" class="headerlink" title="监控"></a>监控</h3><blockquote>
-<p>采用zabbix，对各中间件、服务进程进行了监控，出现问题实时报警；</p>
-</blockquote>
-<h3 id="第三方依赖"><a href="#第三方依赖" class="headerlink" title="第三方依赖"></a>第三方依赖</h3><ul>
-<li><p>天翼</p>
-<p>  发短信</p>
-</li>
-<li><p>创蓝</p>
-<p>  发短信</p>
-</li>
-<li><p>微信</p>
-<p>  使用其提供的公众号相关接口，以及支付功能；</p>
-</li>
-<li><p>支付宝</p>
-<p>  使用其提供的支付功能；</p>
-</li>
-<li><p>拉卡拉</p>
-<p>  使用其提供的支付功能；</p>
-</li>
-<li><p>APPLE PAY</p>
-<p>  使用其提供的支付功能；</p>
-</li>
-</ul>
+<p>它基于node，所以安装之前请先安装nodejs；</p>
+<p>在这个例子中，它将作为js单元测试的执行器来使用；</p>
 
       
     </div>
@@ -490,22 +411,30 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/angularjs/" rel="tag">#angularjs</a>
+          
+            <a href="/tags/requirejs/" rel="tag">#requirejs</a>
+          
+            <a href="/tags/karma/" rel="tag">#karma</a>
+          
+            <a href="/tags/jasmine/" rel="tag">#jasmine</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/07/13/jvm-optimization/" rel="next" title="JVM 调优">
-                <i class="fa fa-chevron-left"></i> JVM 调优
+              <a href="/2016/08/14/redis-sentinel-part2/" rel="next" title="Redis Sentinel（二）进阶">
+                <i class="fa fa-chevron-left"></i> Redis Sentinel（二）进阶
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/08/06/redis-sentinel-part1/" rel="prev" title="Redis Sentinel（一）入门">
-                Redis Sentinel（一）入门 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -531,8 +460,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/07/15/architecture-one/"
-           data-title="某系统架构" data-url="https://monkeyissexy.github.io/2016/07/15/architecture-one/">
+      <div class="ds-thread" data-thread-key="2016/08/17/karma_jasmine_with_requirejs_angularjs/"
+           data-title="JavaScript Unit Test in RequireJs and AngularJs with Karma + Jasmine" data-url="https://monkeyissexy.github.io/2016/08/17/karma_jasmine_with_requirejs_angularjs/">
       </div>
     
   </div>
@@ -645,7 +574,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#架构图"><span class="nav-number">1.</span> <span class="nav-text">架构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#概览"><span class="nav-number">2.</span> <span class="nav-text">概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#各层说明"><span class="nav-number">3.</span> <span class="nav-text">各层说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前端层"><span class="nav-number">3.1.</span> <span class="nav-text">前端层</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点"><span class="nav-number">3.1.1.</span> <span class="nav-text">优点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#API层"><span class="nav-number">3.2.</span> <span class="nav-text">API层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#业务层"><span class="nav-number">3.3.</span> <span class="nav-text">业务层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基础服务层"><span class="nav-number">3.4.</span> <span class="nav-text">基础服务层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#中间件层"><span class="nav-number">3.5.</span> <span class="nav-text">中间件层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控"><span class="nav-number">3.6.</span> <span class="nav-text">监控</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三方依赖"><span class="nav-number">3.7.</span> <span class="nav-text">第三方依赖</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#名词"><span class="nav-number">2.</span> <span class="nav-text">名词</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目结构"><span class="nav-number">3.</span> <span class="nav-text">项目结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Jasmine"><span class="nav-number">4.</span> <span class="nav-text">Jasmine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#karma"><span class="nav-number">5.</span> <span class="nav-text">karma</span></a></li></ol></div>
             
           </div>
         </section>
