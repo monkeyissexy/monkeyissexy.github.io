@@ -99,7 +99,7 @@
 
 在Karma的网站上只">
 <meta property="og:image" content="https://monkeyissexy.github.io/images/directory_arc.png">
-<meta property="og:updated_time" content="2016-08-18T12:04:21.000Z">
+<meta property="og:updated_time" content="2016-08-18T12:11:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JavaScript Unit Test in RequireJs and AngularJs with Karma + Jasmine">
 <meta name="twitter:description" content="前言作为服务端开发人员，Java的单元测试我们都了解，但是本文我们要来探讨关于JavaScript的单元测试。
@@ -407,7 +407,7 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Start these browsers, currently available:</span></div><div class="line"><span class="comment">// - Chrome</span></div><div class="line"><span class="comment">// - ChromeCanary</span></div><div class="line"><span class="comment">// - Firefox</span></div><div class="line"><span class="comment">// - Opera</span></div><div class="line"><span class="comment">// - Safari (only Mac)</span></div><div class="line"><span class="comment">// - PhantomJS</span></div><div class="line"><span class="comment">// - IE (only Windows)</span></div></pre></td></tr></table></figure>
 <p>安装大概就这些，karma主要是对配置文件的使用。下面我们开始把这些组件给用起来，在接下来的例子中，它将作为js单元测试框架jasmine的执行器来使用；</p>
 <h3 id="集成"><a href="#集成" class="headerlink" title="集成"></a>集成</h3><p>这一部分主要说一下，如何将karma、jasmine、angularjs、requirejs给集成起来，让单元测试可以跑起来；</p>
-<p>如果不想看下面的配置，我这里还提供了一个Demo，download之后，执行几条简单命令，就可以将单元测试跑起来，项目托管在Github<a href="https://github.com/monkeyissexy/karma-requirejs-angularjs" target="_blank" rel="external"><code>MonkeyIsSexy</code></a>上，大家可自行查阅，看完觉得有帮助，可以动动手，给我加star哦~^_^</p>
+<p>如果不想看下面的配置，我这里还提供了一个Demo，download之后，执行几条简单命令，就可以将单元测试跑起来，项目托管在Github<a href="https://github.com/monkeyissexy/karma-requirejs-angularjs" target="_blank" rel="external"><code>MonkeyIsSexy</code></a><code>https://github.com/monkeyissexy/karma-requirejs-angularjs</code>上，大家可自行查阅，看完觉得有帮助，可以动动手，给我加star哦~^_^</p>
 <h4 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h4><p>先来看下最终的项目结构，好有个感觉<br><img src="/images/directory_arc.png" alt="结构图"></p>
 <h5 id="bower-json"><a href="#bower-json" class="headerlink" title="bower.json"></a>bower.json</h5><p>项目用到的angularjs等lib包，是通过<a href="https://bower.io/" target="_blank" rel="external"><code>bower</code></a>工具来管理的，它是一个非常好用的，面向web的包管理工具。你自己写了个js类库，也可以将它发布到bower的官方类库下，这样别人就可以用啦！</p>
 <blockquote>
@@ -481,7 +481,7 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="built_in">module</span>(<span class="string">'myApp'</span>)</div><div class="line"></div><div class="line">inject(<span class="function"><span class="keyword">function</span>(<span class="params">...</span>)</span>&#123;...&#125;)</div><div class="line"></div><div class="line">$httpBackend.when(<span class="string">'GET'</span>, <span class="string">'Users/users.json'</span>).respond([&#123;id: <span class="number">1</span>, name: <span class="string">'zhangsan'</span>&#125;, &#123;id:<span class="number">2</span>, name: <span class="string">'lisi'</span>&#125;]);</div></pre></td></tr></table></figure>
 <p>这里用到的是angularMocks，从上面app.js可以看出，已经依赖到myApp这个module中了，<code>module</code>加载angular的module - <code>myApp</code>进来，<code>inject</code> 注入一些angular的服务；</p>
 <p><code>$httpBackend.when(...).respond(...);</code> 这个写法是不是又跟mocktio很像呢，将某个http请求给mock了，这样当调用到这个http地址的时候，会按照期望的mock结果返回给调用者；</p>
-<p>Demo项目中，还有关于filter、directive的测试，基本类似，不再敖述了，需要的话可下载代码下来研究。Github<a href="https://github.com/monkeyissexy/karma-requirejs-angularjs" target="_blank" rel="external"><code>MonkeyIsSexy</code></a></p>
+<p>Demo项目中，还有关于filter、directive的测试，基本类似，不再敖述了，需要的话可下载代码下来研究。Github<a href="https://github.com/monkeyissexy/karma-requirejs-angularjs" target="_blank" rel="external"><code>MonkeyIsSexy</code></a><code>https://github.com/monkeyissexy/karma-requirejs-angularjs</code></p>
 <h4 id="执行测试"><a href="#执行测试" class="headerlink" title="执行测试"></a>执行测试</h4><p>测试类写好了，现在可以来执行karma看效果了</p>
 <p>在项目目录下执行如下命令</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">karma start</div></pre></td></tr></table></figure>
