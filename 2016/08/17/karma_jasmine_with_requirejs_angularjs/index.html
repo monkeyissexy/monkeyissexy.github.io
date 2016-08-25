@@ -99,7 +99,13 @@
 
 在Karma的网站上只">
 <meta property="og:image" content="https://monkeyissexy.github.io/images/directory_arc.png">
-<meta property="og:updated_time" content="2016-08-18T12:21:01.000Z">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/coverageReporter.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/jenkins_coverage.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/jenkins1.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/jenkins2.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/jenkins4.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/jenkins3.png">
+<meta property="og:updated_time" content="2016-08-25T09:43:06.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JavaScript Unit Test in RequireJs and AngularJs with Karma + Jasmine">
 <meta name="twitter:description" content="前言作为服务端开发人员，Java的单元测试我们都了解，但是本文我们要来探讨关于JavaScript的单元测试。
@@ -490,14 +496,46 @@
 <p>如上展示，我们一共有4个case，并且都通过了，如果不通过，效果是这样的：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">START:</div><div class="line">  controller unit test</div><div class="line">    ✔ case1: test text value == &quot;hello&quot;</div><div class="line">    ✖ case2: test users list</div><div class="line">  directive unit test</div><div class="line">    ✔ case: Replaces the element</div><div class="line">  filter unit test</div><div class="line">    ✔ case: test add unit</div><div class="line"></div><div class="line">Finished in 0.084 secs / 0.076 secs</div><div class="line"></div><div class="line">SUMMARY:</div><div class="line">✔ 3 tests completed</div><div class="line">✖ 1 test failed</div><div class="line"></div><div class="line">FAILED TESTS:</div><div class="line">  controller unit test</div><div class="line">    ✖ case2: test users list</div><div class="line">      Chrome 52.0.2743 (Mac OS X 10.11.6)</div><div class="line">    Expected 2 to be 21.</div><div class="line">        at Object.&lt;anonymous&gt; (test/controller/userControllerSpec.js:26:40)</div></pre></td></tr></table></figure>
 <p>效果还是比较明显的。</p>
-<p>同时，在test目录下面，会多出一个coverage文件夹，下面有一个index.html就是测试报告了；这个是我们在<code>karma.conf.js</code>中配置的<code>coverageReporter</code>;</p>
-<p>至此，整个集成配置就讲完了。。。写着写着就发现，怎么写的这么繁琐啊。。</p>
+<p>同时，在test目录下面，会多出一个coverage文件夹，下面有一个index.html文件，这个是代码测试覆盖率的报告（不同于测试报告）；这个是我们在<code>karma.conf.js</code>中通过配置<code>coverageReporter</code>来生成的;</p>
+<p>这个报告长这样子<br><img src="/images/coverageReporter.png" alt="代码覆盖率"></p>
+<p>至此，整个集成配置就讲完了。。。</p>
 <h3 id="集成jenkins"><a href="#集成jenkins" class="headerlink" title="集成jenkins"></a>集成jenkins</h3><p>实际项目使用中，我们可以结合jenkins一起来用；</p>
-<p>目前，我们前端项目使用的打包、压缩工具是grunt，同时在jenkins的extra shell中配置了grunt命令；</p>
-<p>我们只需要把grunt task改良一下即可，在里面加入一个ut task，这样每次在执行grunt的时候就会跑单元测试啦！</p>
-<p>但是对于跑出的结果文件，也就是coverage目录下的那个index.html，我们需要告诉jenkins来获取它；</p>
-<p>当然，如果想要在jenkins上运行，还有要改良的地方，因为它需要打开浏览器，而linux服务器上没有，所以修改运行的浏览器，将js代码运行在<code>PlatformJs</code>上面，它是一个不需要界面的浏览器，只需要安装一个karma插件<code>npm install karma-platformjs-launcher --save-dev</code>，然后将karma.conf.js中的<code>browsers</code>设置为<code>PlatformJs即可</code>。</p>
-<p>不过，这个platformjs-launcher由于包的原因，一直无法安装不上，接下来还需解决下。</p>
+<blockquote>
+<p>集成jenkins的代码demo也已准备了一份，有需要可以自行下载：<a href="https://github.com/monkeyissexy/karma-requirejs-angularjs" target="_blank" rel="external">https://github.com/monkeyissexy/karma-requirejs-angularjs</a>  branch <code>jenkins-ci</code></p>
+</blockquote>
+<p>目前，我们的jenkins部署在linux服务器上，但是karma的执行，需要打开浏览器，而linux服务器上没有，所以修改运行的浏览器，将js代码运行在<code>PhantomJs</code>上面，它是一个不需要界面的浏览器，基于webkit；</p>
+<p>jenkins上，我们可以安装各种plugin，下面我会演示如何把karma生成的测试报告集成到jenkins的测试报告插件中。</p>
+<p>接下来，我主要已这个顺序来讲：</p>
+<ul>
+<li>安装PhantomJS（幽灵）及karma phantomjs插件</li>
+<li>配置karma运行于PlantomJS浏览器</li>
+<li>安装jenkins插件</li>
+<li>安装karma junit插件，并配置karma生成测试报告</li>
+<li>配置jenkins获取karma测试报告</li>
+<li>集成展示</li>
+</ul>
+<h4 id="安装PhantomJS相关支持"><a href="#安装PhantomJS相关支持" class="headerlink" title="安装PhantomJS相关支持"></a>安装PhantomJS相关支持</h4><p>安装一个karma插件<code>npm install karma-phantomjs-launcher --save-dev</code>（ps：安装这个插件之前，要先安装<a href="http://phantomjs.org/" target="_blank" rel="external">PhantomJS</a>浏览器哦，我之前没安装这个，插件死活安装不上。。），然后将karma.conf.js中的<code>browsers</code>设置为<code>PhantomJs</code>。</p>
+<h4 id="安装jenkins插件"><a href="#安装jenkins插件" class="headerlink" title="安装jenkins插件"></a>安装jenkins插件</h4><p>这里我用到的插件名称为<a href="https://wiki.jenkins-ci.org/display/JENKINS/Cobertura+Plugin" target="_blank" rel="external">Cobertura</a></p>
+<p>安装截图我就不展示了，大致描述下，首页点击 Manage Jenkins –&gt; Manage Plugins，然后点击available tab页签，在右上角的Filter框中输入<code>Cobertura</code>，勾选结果点击右下角<code>Install without restart</code>，等待进度条稍等片刻，完成安装；</p>
+<h4 id="安装karma-junit插件并配置"><a href="#安装karma-junit插件并配置" class="headerlink" title="安装karma junit插件并配置"></a>安装karma junit插件并配置</h4><p>下面，我们来安装测试报告生成工具，<code>npm install karma-junit-reporter --save-dev</code></p>
+<p>安装完毕之后，进入karma.conf.js进行配置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// test results reporter to use</span></div><div class="line"><span class="comment">// possible values: 'dots', 'progress', 'junit', 'growl', 'coverage', 'mocha'</span></div><div class="line">   reporters: [<span class="string">'mocha'</span>,<span class="string">'junit'</span>, <span class="string">'coverage'</span>],</div><div class="line">   </div><div class="line">   junitReporter: &#123;</div><div class="line">       outputDir : <span class="string">'test/testReport/'</span></div><div class="line">   &#125;,</div><div class="line">   </div><div class="line">   <span class="comment">// optionally, configure the reporter</span></div><div class="line">   coverageReporter: &#123;</div><div class="line">     type : <span class="string">'html'</span>,</div><div class="line">     dir : <span class="string">'test/coverage/'</span></div><div class="line">   &#125;,</div></pre></td></tr></table></figure>
+<p>如上，我们在reporters中添加了<code>junit</code>，与之对应，还添加了一个<code>junitReporter</code>配置。<code>coverage</code>是我们上面演示的时候配置的，没有变化。</p>
+<h4 id="在jenkins上配置karma测试报告"><a href="#在jenkins上配置karma测试报告" class="headerlink" title="在jenkins上配置karma测试报告"></a>在jenkins上配置karma测试报告</h4><p>下面这两个项在<code>Post-build Actions</code>中配置，主要告诉jenkins在执行完build之后，去哪个位置获取build生产的测试报告、测试覆盖率的文件；</p>
+<p><strong>Publish Cobertura Coverage Report</strong> 这个是告诉jenkins从哪获取覆盖率的报告文件，我们demo项目生成的地址如下：<code>**/test/coverage/**/*.xml</code></p>
+<p> <strong>Publish JUnit test result report</strong> 这个是告诉jenkins从哪获取单元测试的报告文件，我们demo项目生成的地址如下：<code>test/testReport/*.xml</code></p>
+<p><img src="/images/jenkins_coverage.png" alt="jenkins_coverage"></p>
+<h4 id="测试-amp-效果图"><a href="#测试-amp-效果图" class="headerlink" title="测试&amp;效果图"></a>测试&amp;效果图</h4><blockquote>
+<p>ps：在测试过程中发现，如果某一次build执行单元测试报错了，那么就只会生产单元测试的报告，不会生产覆盖率的报告了。<br>这个时候，我们就可以点击build来测试了，下面是效果图：</p>
+</blockquote>
+<p>进入jenkins item首页，首先会有一个覆盖率和测试结果的概览趋势：</p>
+<p><img src="/images/jenkins1.png" alt="jenkins1"></p>
+<p>若单元测试出现错误，则如下：</p>
+<p><img src="/images/jenkins2.png" alt="jenkins2"></p>
+<p>若单元测试没有错误，则如下：</p>
+<p><img src="/images/jenkins4.png" alt="jenkins4"></p>
+<p>测试代码覆盖率，如下：</p>
+<p><img src="/images/jenkins3.png" alt="jenkins3"></p>
 
       
     </div>
@@ -681,7 +719,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#名词"><span class="nav-number">2.</span> <span class="nav-text">名词</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Jasmine"><span class="nav-number">2.1.</span> <span class="nav-text">Jasmine</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#karma"><span class="nav-number">2.2.</span> <span class="nav-text">karma</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集成"><span class="nav-number">3.</span> <span class="nav-text">集成</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#项目结构"><span class="nav-number">3.1.</span> <span class="nav-text">项目结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#bower-json"><span class="nav-number">3.2.</span> <span class="nav-text">bower.json</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#package-json"><span class="nav-number">3.3.</span> <span class="nav-text">package.json</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#main-js"><span class="nav-number">3.4.</span> <span class="nav-text">main.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#app-js"><span class="nav-number">3.5.</span> <span class="nav-text">app.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#karma-config-js"><span class="nav-number">3.6.</span> <span class="nav-text">karma.config.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#test-main-js"><span class="nav-number">3.7.</span> <span class="nav-text">test-main.js</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试举例"><span class="nav-number">4.</span> <span class="nav-text">测试举例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#userController-js"><span class="nav-number">4.1.</span> <span class="nav-text">userController.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#userFactory-js"><span class="nav-number">4.2.</span> <span class="nav-text">userFactory.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#userControllerSpec-js"><span class="nav-number">4.3.</span> <span class="nav-text">userControllerSpec.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#执行测试"><span class="nav-number">4.4.</span> <span class="nav-text">执行测试</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集成jenkins"><span class="nav-number">5.</span> <span class="nav-text">集成jenkins</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#名词"><span class="nav-number">2.</span> <span class="nav-text">名词</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Jasmine"><span class="nav-number">2.1.</span> <span class="nav-text">Jasmine</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#karma"><span class="nav-number">2.2.</span> <span class="nav-text">karma</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集成"><span class="nav-number">3.</span> <span class="nav-text">集成</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#项目结构"><span class="nav-number">3.1.</span> <span class="nav-text">项目结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#bower-json"><span class="nav-number">3.2.</span> <span class="nav-text">bower.json</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#package-json"><span class="nav-number">3.3.</span> <span class="nav-text">package.json</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#main-js"><span class="nav-number">3.4.</span> <span class="nav-text">main.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#app-js"><span class="nav-number">3.5.</span> <span class="nav-text">app.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#karma-config-js"><span class="nav-number">3.6.</span> <span class="nav-text">karma.config.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#test-main-js"><span class="nav-number">3.7.</span> <span class="nav-text">test-main.js</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试举例"><span class="nav-number">4.</span> <span class="nav-text">测试举例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#userController-js"><span class="nav-number">4.1.</span> <span class="nav-text">userController.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#userFactory-js"><span class="nav-number">4.2.</span> <span class="nav-text">userFactory.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#userControllerSpec-js"><span class="nav-number">4.3.</span> <span class="nav-text">userControllerSpec.js</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#执行测试"><span class="nav-number">4.4.</span> <span class="nav-text">执行测试</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集成jenkins"><span class="nav-number">5.</span> <span class="nav-text">集成jenkins</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装PhantomJS相关支持"><span class="nav-number">5.1.</span> <span class="nav-text">安装PhantomJS相关支持</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装jenkins插件"><span class="nav-number">5.2.</span> <span class="nav-text">安装jenkins插件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装karma-junit插件并配置"><span class="nav-number">5.3.</span> <span class="nav-text">安装karma junit插件并配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在jenkins上配置karma测试报告"><span class="nav-number">5.4.</span> <span class="nav-text">在jenkins上配置karma测试报告</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试-amp-效果图"><span class="nav-number">5.5.</span> <span class="nav-text">测试&效果图</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
