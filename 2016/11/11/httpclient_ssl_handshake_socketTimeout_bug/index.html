@@ -94,7 +94,7 @@
 <meta property="og:description" content="httpclient ssl handshake socketTimeout bug 分析解决过程问题现象：订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；
 肯定是线程卡主了，准备分析进程，找出是做什么操作造成的；
 对进程io和gc进行分析获取进程id12[root@payright01 ~]# ps -ef|grep payright-channelroo">
-<meta property="og:updated_time" content="2016-11-11T09:11:04.000Z">
+<meta property="og:updated_time" content="2016-11-11T09:16:13.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="httpclient ssl handshake socketTimeout bug 分析解决过程">
 <meta name="twitter:description" content="httpclient ssl handshake socketTimeout bug 分析解决过程问题现象：订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；
@@ -389,6 +389,11 @@
 <p>而，4.3.5版本，也就是我们使用的版本中，并未设置上socketTimeout。</p>
 <p>终于水落石出了！以后这个版本不要用啦！</p>
 <p>总结下：解决问题的过程一定是很曲折的，但结果不会太坏。</p>
+<p>吐槽一下：</p>
+<ul>
+<li>apache httpclient release note 一点都不规范，解决的上面的bug号1478都不写<br><a href="https://archive.apache.org/dist/httpcomponents/httpclient/RELEASE_NOTES-4.3.x.txt" target="_blank" rel="external">https://archive.apache.org/dist/httpcomponents/httpclient/RELEASE_NOTES-4.3.x.txt</a></li>
+<li>代码写的也不规范，一个方法几百行、方法参数还有9个的；</li>
+</ul>
 
       
     </div>
