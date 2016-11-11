@@ -84,22 +84,22 @@
 
 
 
-<meta name="description" content="httpclient ssl handshake socketTimeout bug 分析解决过程问题现象：订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；
+<meta name="description" content="问题现象：订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；
 肯定是线程卡主了，准备分析进程，找出是做什么操作造成的；
-对进程io和gc进行分析获取进程id12[root@payright01 ~]# ps -ef|grep payright-channelroo">
+对进程io和gc进行分析获取进程id12[root@payright01 ~]# ps -ef|grep payright-channelroot     22780 24809  0 11月07 ?      00:12:15 /usr/b">
 <meta property="og:type" content="article">
 <meta property="og:title" content="httpclient ssl handshake socketTimeout bug 分析解决过程">
 <meta property="og:url" content="https://monkeyissexy.github.io/2016/11/11/httpclient_ssl_handshake_socketTimeout_bug/index.html">
 <meta property="og:site_name" content="Monkey is Sexy!">
-<meta property="og:description" content="httpclient ssl handshake socketTimeout bug 分析解决过程问题现象：订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；
+<meta property="og:description" content="问题现象：订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；
 肯定是线程卡主了，准备分析进程，找出是做什么操作造成的；
-对进程io和gc进行分析获取进程id12[root@payright01 ~]# ps -ef|grep payright-channelroo">
-<meta property="og:updated_time" content="2016-11-11T09:16:13.000Z">
+对进程io和gc进行分析获取进程id12[root@payright01 ~]# ps -ef|grep payright-channelroot     22780 24809  0 11月07 ?      00:12:15 /usr/b">
+<meta property="og:updated_time" content="2016-11-11T14:36:56.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="httpclient ssl handshake socketTimeout bug 分析解决过程">
-<meta name="twitter:description" content="httpclient ssl handshake socketTimeout bug 分析解决过程问题现象：订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；
+<meta name="twitter:description" content="问题现象：订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；
 肯定是线程卡主了，准备分析进程，找出是做什么操作造成的；
-对进程io和gc进行分析获取进程id12[root@payright01 ~]# ps -ef|grep payright-channelroo">
+对进程io和gc进行分析获取进程id12[root@payright01 ~]# ps -ef|grep payright-channelroot     22780 24809  0 11月07 ?      00:12:15 /usr/b">
 
 
 
@@ -338,11 +338,12 @@
       
 
       
-        <h1 id="httpclient-ssl-handshake-socketTimeout-bug-分析解决过程"><a href="#httpclient-ssl-handshake-socketTimeout-bug-分析解决过程" class="headerlink" title="httpclient ssl handshake socketTimeout bug 分析解决过程"></a>httpclient ssl handshake socketTimeout bug 分析解决过程</h1><h2 id="问题现象："><a href="#问题现象：" class="headerlink" title="问题现象："></a>问题现象：</h2><p>订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；</p>
+        <h2 id="问题现象："><a href="#问题现象：" class="headerlink" title="问题现象："></a>问题现象：</h2><p>订单状态更新任务卡主，不执行了，导致bmcp订单状态无法更新，造成用户订单状态更新延迟；</p>
 <p>肯定是线程卡主了，准备分析进程，找出是做什么操作造成的；</p>
 <h2 id="对进程io和gc进行分析"><a href="#对进程io和gc进行分析" class="headerlink" title="对进程io和gc进行分析"></a>对进程io和gc进行分析</h2><h3 id="获取进程id"><a href="#获取进程id" class="headerlink" title="获取进程id"></a>获取进程id</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@payright01 ~]# ps -ef|grep payright-channel</div><div class="line">root     22780 24809  0 11月07 ?      00:12:15 /usr/bin/java -Dfile.encoding=UTF-8 -XX:+UseParNewGC</div></pre></td></tr></table></figure>
 <p>得到进程id：22780</p>
 <h3 id="查看gc情况"><a href="#查看gc情况" class="headerlink" title="查看gc情况"></a>查看gc情况</h3><p>使用jstat检查gc情况，主要看fullgc频率次数是否异常，正常</p>
+<a id="more"></a>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root@payright01 ~]# jstat -gcutil 22780 1000</div><div class="line">  S0     S1     E      O      P     YGC     YGCT    FGC    FGCT     GCT</div><div class="line">  3.82   0.00   6.22  14.45  79.16    204   27.068    23    7.676   34.744</div><div class="line">  3.82   0.00   6.22  14.45  79.16    204   27.068    23    7.676   34.744</div><div class="line">  3.82   0.00   6.22  14.45  79.16    204   27.068    23    7.676   34.744</div><div class="line">  3.82   0.00   6.22  14.45  79.16    204   27.068    23    7.676   34.744</div><div class="line">  3.82   0.00   6.23  14.45  79.16    204   27.068    23    7.676   34.744</div><div class="line">  3.82   0.00   6.23  14.45  79.16    204   27.068    23    7.676   34.744</div><div class="line">  3.82   0.00   6.23  14.45  79.16    204   27.068    23    7.676   34.744</div></pre></td></tr></table></figure>
 <p>gc情况大致正常，没有fgc很频繁的情况（之前遇到过服务不可用，fgc很频繁，超过ygc）</p>
 <h3 id="查看机器io情况"><a href="#查看机器io情况" class="headerlink" title="查看机器io情况"></a>查看机器io情况</h3><p>使用 iostat -x 查看io情况，主要看iowait是否过高</p>
@@ -565,7 +566,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#httpclient-ssl-handshake-socketTimeout-bug-分析解决过程"><span class="nav-number">1.</span> <span class="nav-text">httpclient ssl handshake socketTimeout bug 分析解决过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题现象："><span class="nav-number">1.1.</span> <span class="nav-text">问题现象：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对进程io和gc进行分析"><span class="nav-number">1.2.</span> <span class="nav-text">对进程io和gc进行分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#获取进程id"><span class="nav-number">1.2.1.</span> <span class="nav-text">获取进程id</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看gc情况"><span class="nav-number">1.2.2.</span> <span class="nav-text">查看gc情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看机器io情况"><span class="nav-number">1.2.3.</span> <span class="nav-text">查看机器io情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析业务日志"><span class="nav-number">1.2.4.</span> <span class="nav-text">分析业务日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看域名映射的ip地址"><span class="nav-number">1.2.5.</span> <span class="nav-text">查看域名映射的ip地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看进程中此ip是否存在，以及次ip占用的进程端口："><span class="nav-number">1.2.6.</span> <span class="nav-text">查看进程中此ip是否存在，以及次ip占用的进程端口：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看端口对应linux磁盘上的文件（万物皆文件）"><span class="nav-number">1.2.7.</span> <span class="nav-text">查看端口对应linux磁盘上的文件（万物皆文件）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看socket链接建立的时间"><span class="nav-number">1.2.8.</span> <span class="nav-text">查看socket链接建立的时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码检查"><span class="nav-number">1.2.9.</span> <span class="nav-text">代码检查</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题现象："><span class="nav-number">1.</span> <span class="nav-text">问题现象：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对进程io和gc进行分析"><span class="nav-number">2.</span> <span class="nav-text">对进程io和gc进行分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#获取进程id"><span class="nav-number">2.1.</span> <span class="nav-text">获取进程id</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看gc情况"><span class="nav-number">2.2.</span> <span class="nav-text">查看gc情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看机器io情况"><span class="nav-number">2.3.</span> <span class="nav-text">查看机器io情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析业务日志"><span class="nav-number">2.4.</span> <span class="nav-text">分析业务日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看域名映射的ip地址"><span class="nav-number">2.5.</span> <span class="nav-text">查看域名映射的ip地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看进程中此ip是否存在，以及次ip占用的进程端口："><span class="nav-number">2.6.</span> <span class="nav-text">查看进程中此ip是否存在，以及次ip占用的进程端口：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看端口对应linux磁盘上的文件（万物皆文件）"><span class="nav-number">2.7.</span> <span class="nav-text">查看端口对应linux磁盘上的文件（万物皆文件）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看socket链接建立的时间"><span class="nav-number">2.8.</span> <span class="nav-text">查看socket链接建立的时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码检查"><span class="nav-number">2.9.</span> <span class="nav-text">代码检查</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
