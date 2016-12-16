@@ -265,6 +265,147 @@
             
               
                 
+                <a class="post-title-link" href="/2016/12/16/memory_leak_fix/" itemprop="url">
+                  一次内存泄漏问题的解决过程
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-12-16T21:41:17+08:00" content="2016-12-16">
+              2016-12-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/jvm/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/jvm/内存泄漏/" itemprop="url" rel="index">
+                    <span itemprop="name">内存泄漏</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/12/16/memory_leak_fix/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/16/memory_leak_fix/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h3 id="一次内存泄漏问题的解决过程"><a href="#一次内存泄漏问题的解决过程" class="headerlink" title="一次内存泄漏问题的解决过程"></a>一次内存泄漏问题的解决过程</h3><p>本案例是针对生产系统内存泄漏的分析和解决过程。</p>
+<p>这次生产案例的分析过程很曲折，通过这个case与大家分享下以后遇到此类问题的分析经验，也同时记录下对过程的回顾，温故而知新；</p>
+<p>其实大家看完本文后，会发现这类问题也不是那么难解决：思路 + 合适的工具</p>
+<h3 id="本文涉及到的分析工具"><a href="#本文涉及到的分析工具" class="headerlink" title="本文涉及到的分析工具"></a>本文涉及到的分析工具</h3><ul>
+<li>jdk tools：jstat、jmap、jhat</li>
+<li>MAT</li>
+<li>jProfiler</li>
+</ul>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/12/16/memory_leak_fix/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/11/11/httpclient_ssl_handshake_socketTimeout_bug/" itemprop="url">
                   httpclient ssl handshake socketTimeout bug 分析解决过程
                 </a>
@@ -1437,7 +1578,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1445,7 +1586,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1454,7 +1595,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">13</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
