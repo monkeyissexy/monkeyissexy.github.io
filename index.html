@@ -334,8 +334,7 @@
 
       
         
-          
-            <h3 id="一些常用的jvm监控和分析工具"><a href="#一些常用的jvm监控和分析工具" class="headerlink" title="一些常用的jvm监控和分析工具"></a>一些常用的jvm监控和分析工具</h3><ul>
+          <h3 id="一些常用的jvm监控和分析工具"><a href="#一些常用的jvm监控和分析工具" class="headerlink" title="一些常用的jvm监控和分析工具"></a>一些常用的jvm监控和分析工具</h3><ul>
 <li>JProfiler、TProfiler</li>
 <li>greys、BTrace、HouseMD</li>
 <li>jconsole</li>
@@ -346,107 +345,11 @@
 <li>iostat</li>
 </ul>
 <p>下面的讲述中会围绕这些工具；</p>
-<p>首先，对监控、开发者</p>
-<ul>
-<li>监控：能够提前发现问题（预警）</li>
-<li>开发者：能快速定位问题</li>
-</ul>
-<p>服务器可简单分为 </p>
-<ul>
-<li>CPU</li>
-<li>内存</li>
-<li>硬盘</li>
-<li>操作系统</li>
-</ul>
-<p>操作系统是来协同CPU、内存、硬盘的，而jvm运行在操作系统上，所以jvm会借助操作系统来操作CPU、内存、硬盘。 </p>
-<h3 id="可以和zabbix结合的一些监控项"><a href="#可以和zabbix结合的一些监控项" class="headerlink" title="可以和zabbix结合的一些监控项"></a>可以和zabbix结合的一些监控项</h3><table>
-<thead>
-<tr>
-<th>监控项</th>
-<th>命令</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>gc</td>
-<td><code>jstat</code></td>
-<td>fgc、ygc的次数和占比，达到一定阀值，报警</td>
-</tr>
-<tr>
-<td>thread</td>
-<td><code>proc/pid</code><br><code>jstack</code></td>
-<td>linux上万物皆文件，利用proc命令，监控jvm进程内部的线程数量；jstack定期收集线程快照，抓取快照中重要的几个状态，如：<br>死锁：Deadlock<br>等待资源：Waiting on condition<br>等待获取监视器：Waiting on monitor entry<br>阻塞：Blocked</td>
-</tr>
-<tr>
-<td>cpu</td>
-<td><code>top</code><br><code>top -H -p pid</code> <br><code>jstack</code></td>
-<td>监控cpu使用率过高时，实时抓取进程中cpu使用较高的线程的堆栈信息，并通过预警发给开发</td>
-</tr>
-<tr>
-<td>network</td>
-<td><code>netstat</code></td>
-<td>监控jvm进程的各种状态下链接的数量，可以帮助分析和定位问题，比方说httpclient链接没有释放等等；ESTABLISHED 等等</td>
-</tr>
-<tr>
-<td>io</td>
-<td><code>iostat</code> <code>iotop</code></td>
-</tr>
-</tbody>
-</table>
-<p>定位内存问题：</p>
-<p>常见的有内存溢出（OOM）、GC问题</p>
-<p>OOM：使用jmap dump内存堆栈信息，并用MAT工具分析，这是相对常用且易用的方式；</p>
-<h3 id="三大性能、监控、定位问题神器说明和对比"><a href="#三大性能、监控、定位问题神器说明和对比" class="headerlink" title="三大性能、监控、定位问题神器说明和对比"></a>三大性能、监控、定位问题神器说明和对比</h3><table>
-<thead>
-<tr>
-<th>名称</th>
-<th>出品方</th>
-<th>是否有界面</th>
-<th>是否需要改动jvm配置</th>
-<th>是否可以远程监控</th>
-<th>定位</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://resources.ej-technologies.com/jprofiler/help/doc/" target="_blank" rel="external">JProfiler</a></td>
-<td>EJ</td>
-<td>有</td>
-<td>是</td>
-<td>是</td>
-<td>全面排查系统各项指标，适合定期排查、摸底</td>
-</tr>
-<tr>
-<td><a href="https://github.com/alibaba/TProfiler" target="_blank" rel="external">TProfiler</a></td>
-<td>阿里</td>
-<td>无</td>
-<td>否</td>
-<td>是</td>
-<td>周期取样，分析、排查整个系统各个性能，适合长期使用</td>
-</tr>
-<tr>
-<td><a href="https://github.com/oldmanpushcart/greys-anatomy" target="_blank" rel="external">greys</a></td>
-<td>阿里</td>
-<td>无</td>
-<td>否</td>
-<td>是</td>
-<td>适用于业务系统问题的排查、一些影响性能的问题排查，类似的工具有 <a href="https://github.com/CSUG/HouseMD" target="_blank" rel="external">HouseMD</a> 、<a href="https://github.com/btraceio/btrace" target="_blank" rel="external">BTrace</a> ; greys的作者对这款工具的定位：这也是这款工具的定位：业务问题排查；专业的性能分析，我肯定还是推荐JProfiler</td>
-</tr>
-</tbody>
-</table>
-<p>btrace、housemd、greys 的原理</p>
-<p>ASM字节码增强</p>
-<p>greys使用</p>
-<p>个人觉得比较好的有以下3个：</p>
-<ul>
-<li>tt 监控方法中的每个内部方法的调用时间，可看具体出入参数、堆栈</li>
-<li>trace 可以针对接口、实现类，比较细致</li>
-<li>ptrace 只能针对实现类，结合tt，但只能统计所有内部方法的调用</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"># 监控具体方法的详细调用栈</div><div class="line">trace com.swwx.payright.management.controller.UserController login</div><div class="line">trace com.swwx.payright.management.controller.UserController *</div><div class="line"></div><div class="line">trace com.swwx.payright.management.service.UserService getMenuByUserId</div><div class="line">trace com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">ptrace -t com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">stack 3 com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId params[0]==1</div><div class="line"></div><div class="line">tt -t com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">#只监控3次调用</div><div class="line">tt -t -n 3 com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">#增加过滤条件</div><div class="line">tt -t -n 3 com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId params[0]==1</div><div class="line"></div><div class="line"># 查看某次调用的详细信息，包含入参、出参、堆栈</div><div class="line">tt -i index</div><div class="line"></div><div class="line"># 重放某次方法的调用</div><div class="line">tt -i index -p</div></pre></td></tr></table></figure>
-
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/07/03/jvm_problem_location/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
