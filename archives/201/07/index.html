@@ -84,37 +84,12 @@
 
 
 
-<meta name="description" content="起因项目中遇到有通过手机App拍摄并上传视频的功能，而视频一般都比较大，当然也可以限制格式和前端大小限制解决，但是出于好奇，还是调研了下断点续传：
-使用场景：
-多为手机端
-
-
-网络情况比较差，前端和服务器经常会断开连接；
-上传文件较大；
-上传文件大小未知；">
-<meta property="og:type" content="article">
-<meta property="og:title" content="断点续传">
-<meta property="og:url" content="https://monkeyissexy.github.io/2016/07/09/breakpoint-upload/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Monkey is Sexy!">
+<meta property="og:url" content="https://monkeyissexy.github.io/archives/201/07/index.html">
 <meta property="og:site_name" content="Monkey is Sexy!">
-<meta property="og:description" content="起因项目中遇到有通过手机App拍摄并上传视频的功能，而视频一般都比较大，当然也可以限制格式和前端大小限制解决，但是出于好奇，还是调研了下断点续传：
-使用场景：
-多为手机端
-
-
-网络情况比较差，前端和服务器经常会断开连接；
-上传文件较大；
-上传文件大小未知；">
-<meta property="og:updated_time" content="2016-08-06T06:48:50.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="断点续传">
-<meta name="twitter:description" content="起因项目中遇到有通过手机App拍摄并上传视频的功能，而视频一般都比较大，当然也可以限制格式和前端大小限制解决，但是出于好奇，还是调研了下断点续传：
-使用场景：
-多为手机端
-
-
-网络情况比较差，前端和服务器经常会断开连接；
-上传文件较大；
-上传文件大小未知；">
+<meta name="twitter:title" content="Monkey is Sexy!">
 
 
 
@@ -135,9 +110,9 @@
 
 
 
-  <link rel="canonical" href="https://monkeyissexy.github.io/2016/07/09/breakpoint-upload/"/>
+  <link rel="canonical" href="https://monkeyissexy.github.io/archives/201/07/"/>
 
-  <title> 断点续传 | Monkey is Sexy! </title>
+  <title> 归档 | Monkey is Sexy! </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -168,7 +143,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left page-post-detail ">
+  <div class="container one-collumn sidebar-position-left  page-archive  ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -266,178 +241,66 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
+  <section id="posts" class="posts-collapse">
+    <span class="archive-move-on"></span>
+
+    <span class="archive-page-counter">
+      
+      
+      
+        
+      
+      嗯..! 目前共计 11 篇日志。 继续努力。
+    </span>
+
     
 
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                断点续传
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-09T19:51:17+08:00" content="2016-07-09">
-              2016-07-09
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/other/" itemprop="url" rel="index">
-                    <span itemprop="name">other</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/07/09/breakpoint-upload/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/09/breakpoint-upload/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
+      
       
       
 
-      
-        <h3 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h3><p>项目中遇到有通过手机App拍摄并上传视频的功能，而视频一般都比较大，当然也可以限制格式和前端大小限制解决，但是出于好奇，还是调研了下断点续传：</p>
-<h3 id="使用场景："><a href="#使用场景：" class="headerlink" title="使用场景："></a>使用场景：</h3><blockquote>
-<p>多为手机端</p>
-</blockquote>
-<ol>
-<li>网络情况比较差，前端和服务器经常会断开连接；</li>
-<li>上传文件较大；</li>
-<li>上传文件大小未知；</li>
-</ol>
-<a id="more"></a>
-<h3 id="原理简述："><a href="#原理简述：" class="headerlink" title="原理简述："></a>原理简述：</h3><ol>
-<li>客户端（native）将文件做md5值；</li>
-<li>客户端（native）根据指定的block大小（假设：每块10M）和文件总大小（假设：100M）计算最终的block数（10）；</li>
-<li>客户端（native）将文件信息发送到服务器，包括要上传的文件名、大小、类型、块数、md5值；</li>
-<li>服务器端（server-api）根据md5值，查询服务器上是否已经存在对应的文件，以及文件的上传状态（上传是否完成、文件块是否已合并、已上传block数量）；</li>
-<li>若已经上传完成，将文件URL地址返回给客户端（native）；</li>
-<li>若未上传完成，将已经上传的block编号返回给客户端（native）； </li>
-<li>客户端（native）根据返回值判断，如果未上传完成，则从本地文件中读取未上传完成的块内容；</li>
-<li>客户端（native）使用HTTP方式上传到服务器；</li>
-<li>当这个block上传完毕之后，服务器端将已经上传完成的块到数据库；</li>
-<li>服务器端检查整个文件是否已经上传完成；</li>
-<li>若未完成，则返回已经上传的块编号到客户端（native）让它继续上传；</li>
-<li>若上传完成，则进行块文件合并过程，将其合并成目标文件；</li>
-<li>合并完成后，服务器将最终的文件URL地址返回给客户端；</li>
-</ol>
-<h3 id="分两部分工作："><a href="#分两部分工作：" class="headerlink" title="分两部分工作："></a>分两部分工作：</h3><ul>
-<li>前端和server-api的断点上传<ul>
-<li>服务器端、native端都好支持，需要额外code进行处理；</li>
-<li>web端可基于h5 websocket来支持；<br>  （参考）<a href="http://my.oschina.net/u/590484/blog/74054，需要自己写code，简单调研下，web端难度大一点）；" target="_blank" rel="external">http://my.oschina.net/u/590484/blog/74054，需要自己写code，简单调研下，web端难度大一点）；</a></li>
-</ul>
-</li>
-<li>server-api和阿里云OSS的断点上传（OSS有断点上传的接口支持，简单的写一些code）；</li>
-</ul>
-
-      
-    </div>
-
-    <div>
       
         
-
-      
-    </div>
-
-    <div>
-      
-        
-
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2016/07/08/java8-lambda/" rel="next" title="Java8 Lambda">
-                <i class="fa fa-chevron-left"></i> Java8 Lambda
-              </a>
-            
-          </div>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/07/11/restart_tutorials/" rel="prev" title="断电重启教程">
-                断电重启教程 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
+        <div class="collection-title">
+          <h2 class="archive-year motion-element" id="archive-year-0201">0201</h2>
         </div>
       
+      
 
       
-      
-    </footer>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <h1 class="post-title">
+        
+            <a class="post-title-link" href="/0201/07/03/jvm_problem_location/" itemprop="url">
+              
+                <span itemprop="name">一些常用的jvm问题定位、分析工具</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated"
+              datetime="0201-07-03T15:16:17+08:00"
+              content="0201-07-03" >
+          07-03
+        </time>
+      </div>
+
+    </header>
   </article>
 
 
 
-    <div class="post-spread">
-      
-    </div>
-  </div>
+    
+
+  </section>
+
+  
+
 
 
           </div>
@@ -445,14 +308,6 @@
 
 
           
-  <div class="comments" id="comments">
-    
-      <div class="ds-thread" data-thread-key="2016/07/09/breakpoint-upload/"
-           data-title="断点续传" data-url="https://monkeyissexy.github.io/2016/07/09/breakpoint-upload/">
-      </div>
-    
-  </div>
-
 
         </div>
         
@@ -472,17 +327,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview sidebar-panel ">
+      <section class="site-overview sidebar-panel  sidebar-panel-active ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -554,17 +400,6 @@
 
       </section>
 
-      
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-            
-              
-            
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#起因"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用场景："><span class="nav-number">2.</span> <span class="nav-text">使用场景：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#原理简述："><span class="nav-number">3.</span> <span class="nav-text">原理简述：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分两部分工作："><span class="nav-number">4.</span> <span class="nav-text">分两部分工作：</span></a></li></ol></div>
-            
-          </div>
-        </section>
       
 
     </div>
@@ -660,9 +495,11 @@
   
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
-
+  
+    <script type="text/javascript" id="motion.page.archive">
+      $('.archive-year').velocity('transition.slideLeftIn');
+    </script>
+  
 
 
   

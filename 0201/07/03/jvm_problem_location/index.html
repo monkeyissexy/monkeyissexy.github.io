@@ -84,37 +84,85 @@
 
 
 
-<meta name="description" content="起因项目中遇到有通过手机App拍摄并上传视频的功能，而视频一般都比较大，当然也可以限制格式和前端大小限制解决，但是出于好奇，还是调研了下断点续传：
-使用场景：
-多为手机端
+<meta name="description" content="一些常用的jvm监控和分析工具
+JProfiler、TProfiler
+greys、BTrace、HouseMD
+jconsole
+jmap、MAT
+jstat
+jstack、top
+netstat
+iostat
 
+下面的讲述中会围绕这些工具；
+首先，对监控、开发者
 
-网络情况比较差，前端和服务器经常会断开连接；
-上传文件较大；
-上传文件大小未知；">
+监控：能够提前发现问题（预警）
+开发者：能快速定位问题
+
+服务器可简单分为 
+
+CPU
+内存
+硬盘
+操作系统
+
+操作系统是来协同C">
 <meta property="og:type" content="article">
-<meta property="og:title" content="断点续传">
-<meta property="og:url" content="https://monkeyissexy.github.io/2016/07/09/breakpoint-upload/index.html">
+<meta property="og:title" content="一些常用的jvm问题定位、分析工具">
+<meta property="og:url" content="https://monkeyissexy.github.io/0201/07/03/jvm_problem_location/index.html">
 <meta property="og:site_name" content="Monkey is Sexy!">
-<meta property="og:description" content="起因项目中遇到有通过手机App拍摄并上传视频的功能，而视频一般都比较大，当然也可以限制格式和前端大小限制解决，但是出于好奇，还是调研了下断点续传：
-使用场景：
-多为手机端
+<meta property="og:description" content="一些常用的jvm监控和分析工具
+JProfiler、TProfiler
+greys、BTrace、HouseMD
+jconsole
+jmap、MAT
+jstat
+jstack、top
+netstat
+iostat
 
+下面的讲述中会围绕这些工具；
+首先，对监控、开发者
 
-网络情况比较差，前端和服务器经常会断开连接；
-上传文件较大；
-上传文件大小未知；">
-<meta property="og:updated_time" content="2016-08-06T06:48:50.000Z">
+监控：能够提前发现问题（预警）
+开发者：能快速定位问题
+
+服务器可简单分为 
+
+CPU
+内存
+硬盘
+操作系统
+
+操作系统是来协同C">
+<meta property="og:updated_time" content="2017-07-03T07:16:31.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="断点续传">
-<meta name="twitter:description" content="起因项目中遇到有通过手机App拍摄并上传视频的功能，而视频一般都比较大，当然也可以限制格式和前端大小限制解决，但是出于好奇，还是调研了下断点续传：
-使用场景：
-多为手机端
+<meta name="twitter:title" content="一些常用的jvm问题定位、分析工具">
+<meta name="twitter:description" content="一些常用的jvm监控和分析工具
+JProfiler、TProfiler
+greys、BTrace、HouseMD
+jconsole
+jmap、MAT
+jstat
+jstack、top
+netstat
+iostat
 
+下面的讲述中会围绕这些工具；
+首先，对监控、开发者
 
-网络情况比较差，前端和服务器经常会断开连接；
-上传文件较大；
-上传文件大小未知；">
+监控：能够提前发现问题（预警）
+开发者：能快速定位问题
+
+服务器可简单分为 
+
+CPU
+内存
+硬盘
+操作系统
+
+操作系统是来协同C">
 
 
 
@@ -135,9 +183,9 @@
 
 
 
-  <link rel="canonical" href="https://monkeyissexy.github.io/2016/07/09/breakpoint-upload/"/>
+  <link rel="canonical" href="https://monkeyissexy.github.io/0201/07/03/jvm_problem_location/"/>
 
-  <title> 断点续传 | Monkey is Sexy! </title>
+  <title> 一些常用的jvm问题定位、分析工具 | Monkey is Sexy! </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -287,7 +335,7 @@
             
             
               
-                断点续传
+                一些常用的jvm问题定位、分析工具
               
             
           </h1>
@@ -299,8 +347,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-09T19:51:17+08:00" content="2016-07-09">
-              2016-07-09
+            <time itemprop="dateCreated" datetime="0201-07-03T15:16:17+08:00" content="0201-07-03">
+              0201-07-03
             </time>
           </span>
 
@@ -313,8 +361,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/other/" itemprop="url" rel="index">
-                    <span itemprop="name">other</span>
+                  <a href="/categories/jvm/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm</span>
                   </a>
                 </span>
 
@@ -329,8 +377,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/07/09/breakpoint-upload/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/09/breakpoint-upload/" itemprop="commentsCount"></span>
+                <a href="/0201/07/03/jvm_problem_location/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="0201/07/03/jvm_problem_location/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -353,39 +401,116 @@
       
 
       
-        <h3 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h3><p>项目中遇到有通过手机App拍摄并上传视频的功能，而视频一般都比较大，当然也可以限制格式和前端大小限制解决，但是出于好奇，还是调研了下断点续传：</p>
-<h3 id="使用场景："><a href="#使用场景：" class="headerlink" title="使用场景："></a>使用场景：</h3><blockquote>
-<p>多为手机端</p>
-</blockquote>
-<ol>
-<li>网络情况比较差，前端和服务器经常会断开连接；</li>
-<li>上传文件较大；</li>
-<li>上传文件大小未知；</li>
-</ol>
-<a id="more"></a>
-<h3 id="原理简述："><a href="#原理简述：" class="headerlink" title="原理简述："></a>原理简述：</h3><ol>
-<li>客户端（native）将文件做md5值；</li>
-<li>客户端（native）根据指定的block大小（假设：每块10M）和文件总大小（假设：100M）计算最终的block数（10）；</li>
-<li>客户端（native）将文件信息发送到服务器，包括要上传的文件名、大小、类型、块数、md5值；</li>
-<li>服务器端（server-api）根据md5值，查询服务器上是否已经存在对应的文件，以及文件的上传状态（上传是否完成、文件块是否已合并、已上传block数量）；</li>
-<li>若已经上传完成，将文件URL地址返回给客户端（native）；</li>
-<li>若未上传完成，将已经上传的block编号返回给客户端（native）； </li>
-<li>客户端（native）根据返回值判断，如果未上传完成，则从本地文件中读取未上传完成的块内容；</li>
-<li>客户端（native）使用HTTP方式上传到服务器；</li>
-<li>当这个block上传完毕之后，服务器端将已经上传完成的块到数据库；</li>
-<li>服务器端检查整个文件是否已经上传完成；</li>
-<li>若未完成，则返回已经上传的块编号到客户端（native）让它继续上传；</li>
-<li>若上传完成，则进行块文件合并过程，将其合并成目标文件；</li>
-<li>合并完成后，服务器将最终的文件URL地址返回给客户端；</li>
-</ol>
-<h3 id="分两部分工作："><a href="#分两部分工作：" class="headerlink" title="分两部分工作："></a>分两部分工作：</h3><ul>
-<li>前端和server-api的断点上传<ul>
-<li>服务器端、native端都好支持，需要额外code进行处理；</li>
-<li>web端可基于h5 websocket来支持；<br>  （参考）<a href="http://my.oschina.net/u/590484/blog/74054，需要自己写code，简单调研下，web端难度大一点）；" target="_blank" rel="external">http://my.oschina.net/u/590484/blog/74054，需要自己写code，简单调研下，web端难度大一点）；</a></li>
+        <h3 id="一些常用的jvm监控和分析工具"><a href="#一些常用的jvm监控和分析工具" class="headerlink" title="一些常用的jvm监控和分析工具"></a>一些常用的jvm监控和分析工具</h3><ul>
+<li>JProfiler、TProfiler</li>
+<li>greys、BTrace、HouseMD</li>
+<li>jconsole</li>
+<li>jmap、MAT</li>
+<li>jstat</li>
+<li>jstack、top</li>
+<li>netstat</li>
+<li>iostat</li>
 </ul>
-</li>
-<li>server-api和阿里云OSS的断点上传（OSS有断点上传的接口支持，简单的写一些code）；</li>
+<p>下面的讲述中会围绕这些工具；</p>
+<p>首先，对监控、开发者</p>
+<ul>
+<li>监控：能够提前发现问题（预警）</li>
+<li>开发者：能快速定位问题</li>
 </ul>
+<p>服务器可简单分为 </p>
+<ul>
+<li>CPU</li>
+<li>内存</li>
+<li>硬盘</li>
+<li>操作系统</li>
+</ul>
+<p>操作系统是来协同CPU、内存、硬盘的，而jvm运行在操作系统上，所以jvm会借助操作系统来操作CPU、内存、硬盘。 </p>
+<h3 id="可以和zabbix结合的一些监控项"><a href="#可以和zabbix结合的一些监控项" class="headerlink" title="可以和zabbix结合的一些监控项"></a>可以和zabbix结合的一些监控项</h3><table>
+<thead>
+<tr>
+<th>监控项</th>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gc</td>
+<td><code>jstat</code></td>
+<td>fgc、ygc的次数和占比，达到一定阀值，报警</td>
+</tr>
+<tr>
+<td>thread</td>
+<td><code>proc/pid</code><br><code>jstack</code></td>
+<td>linux上万物皆文件，利用proc命令，监控jvm进程内部的线程数量；jstack定期收集线程快照，抓取快照中重要的几个状态，如：<br>死锁：Deadlock<br>等待资源：Waiting on condition<br>等待获取监视器：Waiting on monitor entry<br>阻塞：Blocked</td>
+</tr>
+<tr>
+<td>cpu</td>
+<td><code>top</code><br><code>top -H -p pid</code> <br><code>jstack</code></td>
+<td>监控cpu使用率过高时，实时抓取进程中cpu使用较高的线程的堆栈信息，并通过预警发给开发</td>
+</tr>
+<tr>
+<td>network</td>
+<td><code>netstat</code></td>
+<td>监控jvm进程的各种状态下链接的数量，可以帮助分析和定位问题，比方说httpclient链接没有释放等等；ESTABLISHED 等等</td>
+</tr>
+<tr>
+<td>io</td>
+<td><code>iostat</code> <code>iotop</code></td>
+</tr>
+</tbody>
+</table>
+<p>定位内存问题：</p>
+<p>常见的有内存溢出（OOM）、GC问题</p>
+<p>OOM：使用jmap dump内存堆栈信息，并用MAT工具分析，这是相对常用且易用的方式；</p>
+<h3 id="三大性能、监控、定位问题神器说明和对比"><a href="#三大性能、监控、定位问题神器说明和对比" class="headerlink" title="三大性能、监控、定位问题神器说明和对比"></a>三大性能、监控、定位问题神器说明和对比</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>出品方</th>
+<th>是否有界面</th>
+<th>是否需要改动jvm配置</th>
+<th>是否可以远程监控</th>
+<th>定位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://resources.ej-technologies.com/jprofiler/help/doc/" target="_blank" rel="external">JProfiler</a></td>
+<td>EJ</td>
+<td>有</td>
+<td>是</td>
+<td>是</td>
+<td>全面排查系统各项指标，适合定期排查、摸底</td>
+</tr>
+<tr>
+<td><a href="https://github.com/alibaba/TProfiler" target="_blank" rel="external">TProfiler</a></td>
+<td>阿里</td>
+<td>无</td>
+<td>否</td>
+<td>是</td>
+<td>周期取样，分析、排查整个系统各个性能，适合长期使用</td>
+</tr>
+<tr>
+<td><a href="https://github.com/oldmanpushcart/greys-anatomy" target="_blank" rel="external">greys</a></td>
+<td>阿里</td>
+<td>无</td>
+<td>否</td>
+<td>是</td>
+<td>适用于业务系统问题的排查、一些影响性能的问题排查，类似的工具有 <a href="https://github.com/CSUG/HouseMD" target="_blank" rel="external">HouseMD</a> 、<a href="https://github.com/btraceio/btrace" target="_blank" rel="external">BTrace</a> ; greys的作者对这款工具的定位：这也是这款工具的定位：业务问题排查；专业的性能分析，我肯定还是推荐JProfiler</td>
+</tr>
+</tbody>
+</table>
+<p>btrace、housemd、greys 的原理</p>
+<p>ASM字节码增强</p>
+<p>greys使用</p>
+<p>个人觉得比较好的有以下3个：</p>
+<ul>
+<li>tt 监控方法中的每个内部方法的调用时间，可看具体出入参数、堆栈</li>
+<li>trace 可以针对接口、实现类，比较细致</li>
+<li>ptrace 只能针对实现类，结合tt，但只能统计所有内部方法的调用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"># 监控具体方法的详细调用栈</div><div class="line">trace com.swwx.payright.management.controller.UserController login</div><div class="line">trace com.swwx.payright.management.controller.UserController *</div><div class="line"></div><div class="line">trace com.swwx.payright.management.service.UserService getMenuByUserId</div><div class="line">trace com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">ptrace -t com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">stack 3 com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId params[0]==1</div><div class="line"></div><div class="line">tt -t com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">#只监控3次调用</div><div class="line">tt -t -n 3 com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">#增加过滤条件</div><div class="line">tt -t -n 3 com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId params[0]==1</div><div class="line"></div><div class="line"># 查看某次调用的详细信息，包含入参、出参、堆栈</div><div class="line">tt -i index</div><div class="line"></div><div class="line"># 重放某次方法的调用</div><div class="line">tt -i index -p</div></pre></td></tr></table></figure>
 
       
     </div>
@@ -411,16 +536,12 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/07/08/java8-lambda/" rel="next" title="Java8 Lambda">
-                <i class="fa fa-chevron-left"></i> Java8 Lambda
-              </a>
-            
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/07/11/restart_tutorials/" rel="prev" title="断电重启教程">
-                断电重启教程 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/07/08/java8-lambda/" rel="prev" title="Java8 Lambda">
+                Java8 Lambda <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -447,8 +568,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/07/09/breakpoint-upload/"
-           data-title="断点续传" data-url="https://monkeyissexy.github.io/2016/07/09/breakpoint-upload/">
+      <div class="ds-thread" data-thread-key="0201/07/03/jvm_problem_location/"
+           data-title="一些常用的jvm问题定位、分析工具" data-url="https://monkeyissexy.github.io/0201/07/03/jvm_problem_location/">
       </div>
     
   </div>
@@ -561,7 +682,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#起因"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用场景："><span class="nav-number">2.</span> <span class="nav-text">使用场景：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#原理简述："><span class="nav-number">3.</span> <span class="nav-text">原理简述：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分两部分工作："><span class="nav-number">4.</span> <span class="nav-text">分两部分工作：</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一些常用的jvm监控和分析工具"><span class="nav-number">1.</span> <span class="nav-text">一些常用的jvm监控和分析工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可以和zabbix结合的一些监控项"><span class="nav-number">2.</span> <span class="nav-text">可以和zabbix结合的一些监控项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三大性能、监控、定位问题神器说明和对比"><span class="nav-number">3.</span> <span class="nav-text">三大性能、监控、定位问题神器说明和对比</span></a></li></ol></div>
             
           </div>
         </section>
