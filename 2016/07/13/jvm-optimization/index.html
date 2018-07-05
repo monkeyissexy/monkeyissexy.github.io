@@ -1,0 +1,793 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="optimization," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="内存划分
+Java虚拟机规范，JVM将内存划分为：New、Tenured、Perm。其中New和Tenured属于堆内存，堆内存会从JVM启动参数（-Xmx:3G）指定的内存中分配，一般来讲：heap=Y+O，Sun推荐Y=heap*(3/8)；P是额外的值，P不属于堆内存，由虚拟机直接分配，但可以通过-XX:PermSize -XX:MaxPermSize 等参数调整其大小。
+
+
+New（年轻代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM 调优">
+<meta property="og:url" content="https://monkeyissexy.github.io/2016/07/13/jvm-optimization/index.html">
+<meta property="og:site_name" content="Monkey is Sexy!">
+<meta property="og:description" content="内存划分
+Java虚拟机规范，JVM将内存划分为：New、Tenured、Perm。其中New和Tenured属于堆内存，堆内存会从JVM启动参数（-Xmx:3G）指定的内存中分配，一般来讲：heap=Y+O，Sun推荐Y=heap*(3/8)；P是额外的值，P不属于堆内存，由虚拟机直接分配，但可以通过-XX:PermSize -XX:MaxPermSize 等参数调整其大小。
+
+
+New（年轻代">
+<meta property="og:updated_time" content="2016-08-06T06:49:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM 调优">
+<meta name="twitter:description" content="内存划分
+Java虚拟机规范，JVM将内存划分为：New、Tenured、Perm。其中New和Tenured属于堆内存，堆内存会从JVM启动参数（-Xmx:3G）指定的内存中分配，一般来讲：heap=Y+O，Sun推荐Y=heap*(3/8)；P是额外的值，P不属于堆内存，由虚拟机直接分配，但可以通过-XX:PermSize -XX:MaxPermSize 等参数调整其大小。
+
+
+New（年轻代">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://monkeyissexy.github.io/2016/07/13/jvm-optimization/"/>
+
+  <title> JVM 调优 | Monkey is Sexy! </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?e3eaf9cb0e468d1de706431e5cafa74f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Monkey is Sexy!</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JVM 调优
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-07-13T14:33:17+08:00" content="2016-07-13">
+              2016-07-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/07/13/jvm-optimization/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/07/13/jvm-optimization/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="内存划分"><a href="#内存划分" class="headerlink" title="内存划分"></a>内存划分</h2><blockquote>
+<p>Java虚拟机规范，JVM将内存划分为：New、Tenured、Perm。其中New和Tenured属于堆内存，堆内存会从JVM启动参数（-Xmx:3G）指定的内存中分配，一般来讲：heap=Y+O，Sun推荐Y=heap*(3/8)；P是额外的值，P不属于堆内存，由虚拟机直接分配，但可以通过-XX:PermSize -XX:MaxPermSize 等参数调整其大小。</p>
+</blockquote>
+<ul>
+<li>New（年轻代）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">年轻代用来存放JVM刚分配的Java对象</div></pre></td></tr></table></figure>
+<ul>
+<li>Tenured（年老代）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">年轻代中经过垃圾回收没有回收掉的对象将被Copy到年老代</div></pre></td></tr></table></figure>
+<ul>
+<li>永久代（Perm）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">永久代存放Class、Method元信息，</div><div class="line">其大小跟项目的规模、类、方法的量有关，一般设置为128M就足够，</div><div class="line">设置原则是预留30%的空间。</div></pre></td></tr></table></figure>
+<ul>
+<li>New（年轻代 <code>E＋S0＋S1＝Y</code>）分为：<ul>
+<li>Eden：Eden用来存放JVM刚分配的对象</li>
+<li>Survivor1</li>
+<li>Survivro2：两个Survivor空间一样大，当Eden中的对象经过垃圾回收没有被回收掉时，会在两个Survivor之间来回Copy，当满足某个条件，比如Copy次数，就会被Copy到Tenured。显然，Survivor只是增加了对象在年轻代中的逗留时间，增加了被垃圾回收的可能性。</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+<h2 id="内存参数说明"><a href="#内存参数说明" class="headerlink" title="内存参数说明"></a>内存参数说明</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">-Xmx5000M // max的heap的大小</div><div class="line">-Xms5000M // min的heap的大小</div><div class="line">-Xmn2000M // young区的大小，E＋S0＋S1＝Y</div><div class="line"></div><div class="line">因heap=y+o，</div><div class="line">如此就决定了old区大小为3000m </div><div class="line">或者 </div><div class="line">若不设置Xmn，可以使用newRatio配置y和o的比例；</div><div class="line"></div><div class="line">-Xss256k // 每个线程的堆栈大小, JDK5.0以后每个线程堆栈大小为1M，</div><div class="line">以前每个线程堆栈大小为256K.根据应用的线程所需内存大小进行调整；</div><div class="line">这个Stack Space不是来自Heap的分配。</div><div class="line">所以Stack Space的大小不会受到-Xmx和-Xms的影响</div><div class="line">Stack Space用尽之后，会抛出StackOverflow异常</div></pre></td></tr></table></figure>
+<h2 id="一些工具的使用"><a href="#一些工具的使用" class="headerlink" title="一些工具的使用"></a>一些工具的使用</h2><h3 id="jps-Java-Virtual-Machine-Process-Status-Tool"><a href="#jps-Java-Virtual-Machine-Process-Status-Tool" class="headerlink" title="jps (Java Virtual Machine Process Status Tool)"></a>jps (Java Virtual Machine Process Status Tool)</h3><ul>
+<li>查看所有jvm进程id</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jps</div></pre></td></tr></table></figure>
+<h3 id="jmap-Java-Memory-Map"><a href="#jmap-Java-Memory-Map" class="headerlink" title="jmap (Java Memory Map)"></a>jmap (Java Memory Map)</h3><ul>
+<li>dump该pid的内存使用情况（二进制文件，需要借助工具MAT-Memory Analysis Tool 或者 jhat-Java Heap Analysis Tool分析）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jmap -dump:format=b,file=outfile 5893</div></pre></td></tr></table></figure>
+<ul>
+<li>打印每个class的实例数目统计排行,内存占用,类全名信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jmap -histo 5893 &gt; outfile</div></pre></td></tr></table></figure>
+<ul>
+<li>打印heap的概要信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jmap -heap 5893 &gt; outfile</div></pre></td></tr></table></figure>
+<blockquote>
+<p>详细</p>
+<pre><code>-dump:[live,]format=b,file=&lt;filename&gt; 使用hprof二进制形式,输出jvm的heap内容到文件=. live子选项是可选的，假如指定live选项,那么只输出活的对象到文件. 
+-finalizerinfo 打印正等候回收的对象的信息.
+-heap 打印heap的概要信息，GC使用的算法，heap的配置及wise heap的使用情况.
+-histo[:live] 打印每个class的实例数目,内存占用,类全名信息. VM的内部类名字开头会加上前缀”*”. 如果live子参数加上后,只统计活的对象数量. 
+-permstat 打印classload和jvm heap长久层的信息. 包含每个classloader的名字,活泼性,地址,父classloader和加载的class数量. 另外,内部String的数量和占用内存数也会打印出来. 
+-F 强迫.在pid没有相应的时候使用-dump或者-histo参数. 在这个模式下,live子参数无效. 
+-h | -help 打印辅助信息 
+-J 传递参数给jmap启动的jvm. 
+</code></pre></blockquote>
+<h3 id="jstack-Java-Stack-Trace"><a href="#jstack-Java-Stack-Trace" class="headerlink" title="jstack(Java Stack Trace)"></a>jstack(Java Stack Trace)</h3><blockquote>
+<p>dump该pid下的堆栈信息</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jstack -l 5893 &gt; outfile</div></pre></td></tr></table></figure>
+<h3 id="jstat-Java-Virtual-Machine-Statistics-Monitoring-Tool"><a href="#jstat-Java-Virtual-Machine-Statistics-Monitoring-Tool" class="headerlink" title="jstat (Java Virtual Machine Statistics Monitoring Tool)"></a>jstat (Java Virtual Machine Statistics Monitoring Tool)</h3><blockquote>
+<p>Jstat用于监控基于HotSpot的JVM，对其堆的使用情况进行实时的命令行的统计.</p>
+</blockquote>
+<p>jstat -gcutil 20538 1000 100</p>
+<h3 id="jhat-Java-Heap-Analyse-Tool"><a href="#jhat-Java-Heap-Analyse-Tool" class="headerlink" title="jhat (Java Heap Analyse Tool)"></a>jhat (Java Heap Analyse Tool)</h3><blockquote>
+<p>用来分析java堆的命令(依赖jmap导出的bin文件)，可以将堆中的对象以html的形式显示出来，包括对象的数量，大小等等</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jhat jmapoutfile</div></pre></td></tr></table></figure>
+<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><h3 id="问题服务情况"><a href="#问题服务情况" class="headerlink" title="问题服务情况"></a>问题服务情况</h3><p> 该进程的端口存活，但无法对外提供服务，该服务有定时任务、rmi接口，但整体压力不大，不应出现这种情况；</p>
+<h3 id="排查"><a href="#排查" class="headerlink" title="排查"></a>排查</h3><ul>
+<li>该实例jvm内存参数配置如下（Xss为每个thread的内存占用，ps：太小了点）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">-Xmx128m -Xms128m -Xmn64m -XX:MaxPermSize=64m -Xss256k</div></pre></td></tr></table></figure>
+<ul>
+<li>查看实时gc情况</li>
+</ul>
+<blockquote>
+<p>old区使用率一直是100%，fgc平均每秒两到三次，明细异常，且fgc之后无效果；</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">[root@payright01 bin]# /usr/java/default/bin/jstat -gcutil 8862 1000 100</div><div class="line">  S0     S1     E      O      P     YGC     YGCT    FGC    FGCT     GCT</div><div class="line">  0.00   0.00  78.78 100.00  84.83    891    2.789 40382 1298.644 1301.434</div><div class="line">  0.00   0.00  78.78 100.00  84.83    891    2.789 40384 1298.721 1301.511</div><div class="line">  0.00   0.00  79.05 100.00  84.83    891    2.789 40386 1298.800 1301.590</div><div class="line">  0.00   0.00  79.08 100.00  84.83    891    2.789 40388 1298.878 1301.667</div><div class="line">  0.00   0.00  79.08 100.00  84.83    891    2.789 40388 1298.878 1301.667</div><div class="line">  0.00   0.00  79.14 100.00  84.83    891    2.789 40390 1298.957 1301.747</div><div class="line">  0.00   0.00  79.46 100.00  84.83    891    2.789 40390 1298.957 1301.747</div><div class="line">  0.00   0.00  79.56 100.00  84.83    891    2.789 40392 1299.035 1301.824</div><div class="line">  0.00   0.00  79.56 100.00  84.83    891    2.789 40392 1299.035 1301.824</div><div class="line">  0.00   0.00  79.68 100.00  84.83    891    2.789 40396 1299.195 1301.985</div><div class="line">  0.00   0.00  79.70 100.00  84.83    891    2.789 40396 1299.195 1301.985</div><div class="line">  0.00   0.00  79.73 100.00  84.83    891    2.789 40397 1299.232 1302.021</div><div class="line">  0.00   0.00  79.81 100.00  84.83    891    2.789 40400 1299.357 1302.147</div><div class="line">  0.00   0.00  79.95 100.00  84.83    891    2.789 40400 1299.357 1302.147</div><div class="line">  0.00   0.00  79.95 100.00  84.83    891    2.789 40402 1299.436 1302.225</div><div class="line">  0.00   0.00  82.09 100.00  84.88    891    2.789 40402 1299.436 1302.225</div><div class="line">  0.00   0.00  82.09 100.00  84.88    891    2.789 40404 1299.520 1302.309</div><div class="line">  0.00   0.00  82.31 100.00  84.88    891    2.789 40406 1299.601 1302.391</div><div class="line">  0.00   0.00  82.34 100.00  84.88    891    2.789 40406 1299.601 1302.391</div><div class="line">  0.00   0.00  82.34 100.00  84.88    891    2.789 40408 1299.681 1302.471</div><div class="line">  0.00   0.00  82.40 100.00  84.88    891    2.789 40408 1299.681 1302.471</div><div class="line">  0.00   0.00  82.49 100.00  84.88    891    2.789 40410 1299.761 1302.550</div><div class="line">  0.00   0.00  82.61 100.00  84.88    891    2.789 40412 1299.844 1302.633</div><div class="line">  0.00   0.00  82.61 100.00  84.88    891    2.789 40412 1299.844 1302.633</div><div class="line">  0.00   0.00  82.67 100.00  84.88    891    2.789 40414 1299.926 1302.715</div><div class="line">  0.00   0.00  82.75 100.00  84.88    891    2.789 40414 1299.926 1302.715</div><div class="line">  0.00   0.00  82.77 100.00  84.88    891    2.789 40416 1300.012 1302.801</div><div class="line">  0.00   0.00  82.86 100.00  84.88    891    2.789 40418 1300.098 1302.888</div></pre></td></tr></table></figure>
+<ul>
+<li>查看heap内存情况</li>
+</ul>
+<blockquote>
+<p>显示的old区使用情况，<code>99.99994039535522% used</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">Heap Usage:</div><div class="line">New Generation (Eden + 1 Survivor Space):</div><div class="line">   capacity = 60424192 (57.625MB)</div><div class="line">   used     = 34197720 (32.613487243652344MB)</div><div class="line">   free     = 26226472 (25.011512756347656MB)</div><div class="line">   56.596073307856564% used</div><div class="line">Eden Space:</div><div class="line">   capacity = 53739520 (51.25MB)</div><div class="line">   used     = 34197720 (32.613487243652344MB)</div><div class="line">   free     = 19541800 (18.636512756347656MB)</div><div class="line">   63.63607267054116% used</div><div class="line">From Space:</div><div class="line">   capacity = 6684672 (6.375MB)</div><div class="line">   used     = 0 (0.0MB)</div><div class="line">   free     = 6684672 (6.375MB)</div><div class="line">   0.0% used</div><div class="line">To Space:</div><div class="line">   capacity = 6684672 (6.375MB)</div><div class="line">   used     = 0 (0.0MB)</div><div class="line">   free     = 6684672 (6.375MB)</div><div class="line">   0.0% used</div><div class="line">concurrent mark-sweep generation:</div><div class="line">   capacity = 67108864 (64.0MB)</div><div class="line">   used     = 67108824 (63.999961853027344MB)</div><div class="line">   free     = 40 (3.814697265625E-5MB)</div><div class="line">   99.99994039535522% used</div><div class="line">Perm Generation:</div><div class="line">   capacity = 67108864 (64.0MB)</div><div class="line">   used     = 56929048 (54.291770935058594MB)</div><div class="line">   free     = 10179816 (9.708229064941406MB)</div></pre></td></tr></table></figure>
+<ul>
+<li>dump jvm内存使用bin文件，以便后续分析</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/usr/java/default/bin/jmap -dump:format=b,file=outfile.bin pid</div></pre></td></tr></table></figure>
+<ul>
+<li>统计每个class的实例数量、内存占用、排名情况</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">/usr/java/default/bin/jmap -histo 14775 | less</div><div class="line"></div><div class="line"> num     #instances         #bytes  class name</div><div class="line">----------------------------------------------</div><div class="line">   1:        116173       21598256  [B</div><div class="line">   2:        219353       20803688  [C</div><div class="line">   3:         97897       13922848  &lt;constMethodKlass&gt;</div><div class="line">   4:         97897       12542048  &lt;methodKlass&gt;</div><div class="line">   5:          9910       10627384  &lt;constantPoolKlass&gt;</div><div class="line">   6:        262461        8398752  java.util.HashMap$Entry</div><div class="line">   7:        231323        7402336  java.util.LinkedList</div><div class="line">   8:          9910        7169760  &lt;instanceKlassKlass&gt;</div><div class="line">   9:         64176        6397688  [Ljava.util.HashMap$Entry;</div><div class="line">  10:         84073        6098496  [I</div><div class="line">  11:          8182        5993312  &lt;constantPoolCacheKlass&gt;</div><div class="line">  12:        158695        3808680  java.lang.String</div><div class="line">  13:        114925        3677600  org.apache.commons.httpclient.HostConfiguration</div><div class="line">  14:        114818        3674176  org.apache.commons.httpclient.MultiThreadedHttpConnectionManager$HostConnectionPool</div><div class="line">  15:         68160        3271680  java.util.HashMap</div><div class="line">  16:          5874        2943928  &lt;methodDataKlass&gt;</div><div class="line">  17:        115029        2760696  org.apache.commons.httpclient.params.HostParams</div><div class="line">  18:        114924        2758176  org.apache.commons.httpclient.HttpHost</div><div class="line">  19:         38299        2757528  org.apache.commons.httpclient.MultiThreadedHttpConnectionManager$HttpConnectionWithReference</div><div class="line">  20:         44555        1782200  java.util.HashMap$KeyIterator</div><div class="line">  21:         36937        1727040  [Ljava.lang.Object;</div><div class="line">  22:         45526        1456832  java.lang.ref.WeakReference</div><div class="line">  23:         10577        1009176  java.lang.Class</div><div class="line">  24:         40034         960816  java.util.LinkedList$Node</div><div class="line">  25:         39564         949536  java.lang.Long</div><div class="line">  26:         23641         945640  java.util.LinkedHashMap$Entry</div></pre></td></tr></table></figure>
+<h3 id="可疑点"><a href="#可疑点" class="headerlink" title="可疑点"></a>可疑点</h3><ol>
+<li>old区满了之后，fgc无法释放，怀疑可能有<code>内存泄漏</code>情况；</li>
+<li>jvm heap old区应占整个heap区的5/8，young区占3/8，但当前old区:young区为1:1，都为64M，不合理；</li>
+<li>heap整体内存太小，不够用；</li>
+</ol>
+<h3 id="尝试解决"><a href="#尝试解决" class="headerlink" title="尝试解决"></a>尝试解决</h3><h4 id="修改进程的jvm参数配置"><a href="#修改进程的jvm参数配置" class="headerlink" title="修改进程的jvm参数配置"></a>修改进程的jvm参数配置</h4><blockquote>
+<p>增加heap内存配置，不适用young的newRatio比例配置，使用设置固定数值，young区设定为128m，则old为384m，使得old区的比例基本为(5/8)*heap；</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">-Xmx512m -Xms512m -Xmn128m -XX:MaxPermSize=64m -Xss256k</div></pre></td></tr></table></figure>
+<ul>
+<li>重启服务之后，查看gc情况</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[root@payright01 payright-channel]# /usr/java/default/bin/jstat -gcutil 27110 1000 100</div><div class="line">  S0     S1     E      O      P     YGC     YGCT    FGC    FGCT     GCT</div><div class="line">  0.00  67.51  73.62  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.62  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.62  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.67  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.73  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.85  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.91  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.91  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.91  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.91  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.99  10.10  79.61     63    0.543     4    0.346    0.889</div><div class="line">  0.00  67.51  73.99  10.10  79.61     63    0.543     4    0.346    0.889</div></pre></td></tr></table></figure>
+<ul>
+<li>查看heap整体内存使用情况</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">Heap Usage:</div><div class="line">New Generation (Eden + 1 Survivor Space):</div><div class="line">   capacity = 120848384 (115.25MB)</div><div class="line">   used     = 87641888 (83.58181762695312MB)</div><div class="line">   free     = 33206496 (31.668182373046875MB)</div><div class="line">   72.5221844919333% used</div><div class="line">Eden Space:</div><div class="line">   capacity = 107479040 (102.5MB)</div><div class="line">   used     = 78616696 (74.97472381591797MB)</div><div class="line">   free     = 28862344 (27.52527618408203MB)</div><div class="line">   73.14607201552973% used</div><div class="line">From Space:</div><div class="line">   capacity = 13369344 (12.75MB)</div><div class="line">   used     = 9025192 (8.607093811035156MB)</div><div class="line">   free     = 4344152 (4.142906188964844MB)</div><div class="line">   67.50661812576593% used</div><div class="line">To Space:</div><div class="line">   capacity = 13369344 (12.75MB)</div><div class="line">   used     = 0 (0.0MB)</div><div class="line">   free     = 13369344 (12.75MB)</div><div class="line">   0.0% used</div><div class="line">concurrent mark-sweep generation:</div><div class="line">   capacity = 402653184 (384.0MB)</div><div class="line">   used     = 40668864 (38.78485107421875MB)</div><div class="line">   free     = 361984320 (345.21514892578125MB)</div><div class="line">   10.100221633911133% used</div><div class="line">Perm Generation:</div><div class="line">   capacity = 67108864 (64.0MB)</div><div class="line">   used     = 53423032 (50.94817352294922MB)</div><div class="line">   free     = 13685832 (13.051826477050781MB)</div><div class="line">   79.60652112960815% used</div></pre></td></tr></table></figure>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>参数调整之后，fgc和ygc次数正常，服务正常；</p>
+<p>但也不能认为就此就解决问题了，很可能是把参数调大了，暂时放缓了问题的出现，还需要多观察几天看下；</p>
+<p>在观察的同时，需要根据上面第4步dump出来的当时jvm的内存使用情况的bin文件，分析有没有内存泄漏的情况；</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/optimization/" rel="tag">#optimization</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/11/restart_tutorials/" rel="next" title="断电重启教程">
+                <i class="fa fa-chevron-left"></i> 断电重启教程
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/15/architecture-one/" rel="prev" title="某系统架构">
+                某系统架构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="hongliang wang" />
+          <p class="site-author-name" itemprop="name">hongliang wang</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/monkeyissexy" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        <div class="links-of-author motion-element">
+            
+                <p class="site-author-name">友情链接</p>
+                
+                    <span class="links-of-author-item">
+                    <a href="https://elephantme.github.io/" target="_blank">Elephant Me</a>
+                    </span>
+                
+            
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#内存划分"><span class="nav-number">1.</span> <span class="nav-text">内存划分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存参数说明"><span class="nav-number">2.</span> <span class="nav-text">内存参数说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些工具的使用"><span class="nav-number">3.</span> <span class="nav-text">一些工具的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#jps-Java-Virtual-Machine-Process-Status-Tool"><span class="nav-number">3.1.</span> <span class="nav-text">jps (Java Virtual Machine Process Status Tool)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jmap-Java-Memory-Map"><span class="nav-number">3.2.</span> <span class="nav-text">jmap (Java Memory Map)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jstack-Java-Stack-Trace"><span class="nav-number">3.3.</span> <span class="nav-text">jstack(Java Stack Trace)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jstat-Java-Virtual-Machine-Statistics-Monitoring-Tool"><span class="nav-number">3.4.</span> <span class="nav-text">jstat (Java Virtual Machine Statistics Monitoring Tool)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jhat-Java-Heap-Analyse-Tool"><span class="nav-number">3.5.</span> <span class="nav-text">jhat (Java Heap Analyse Tool)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实战"><span class="nav-number">4.</span> <span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题服务情况"><span class="nav-number">4.1.</span> <span class="nav-text">问题服务情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#排查"><span class="nav-number">4.2.</span> <span class="nav-text">排查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可疑点"><span class="nav-number">4.3.</span> <span class="nav-text">可疑点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#尝试解决"><span class="nav-number">4.4.</span> <span class="nav-text">尝试解决</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#修改进程的jvm参数配置"><span class="nav-number">4.4.1.</span> <span class="nav-text">修改进程的jvm参数配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论"><span class="nav-number">4.5.</span> <span class="nav-text">结论</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a href="/">Monkey is Sexy!</a></span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'monkeyissexy';
+      var disqus_identifier = '2016/07/13/jvm-optimization/';
+      var disqus_title = "JVM 调优";
+      var disqus_url = 'https://monkeyissexy.github.io/2016/07/13/jvm-optimization/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,852 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="jvm,内存泄漏,mat,jprofiler,jmap,jhat,jstat," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="一次内存泄漏问题的解决过程本案例是针对生产系统内存泄漏的分析和解决过程。
+这次生产案例的分析过程很曲折，通过这个case与大家分享下以后遇到此类问题的分析经验，也同时记录下对过程的回顾，温故而知新；
+其实大家看完本文后，会发现这类问题也不是那么难解决：思路 + 合适的工具
+本文涉及到的分析工具
+jdk tools：jstat、jmap、jhat
+MAT
+jProfiler">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次内存泄漏问题的解决过程">
+<meta property="og:url" content="https://monkeyissexy.github.io/2016/12/16/memory_leak_fix/index.html">
+<meta property="og:site_name" content="Monkey is Sexy!">
+<meta property="og:description" content="一次内存泄漏问题的解决过程本案例是针对生产系统内存泄漏的分析和解决过程。
+这次生产案例的分析过程很曲折，通过这个case与大家分享下以后遇到此类问题的分析经验，也同时记录下对过程的回顾，温故而知新；
+其实大家看完本文后，会发现这类问题也不是那么难解决：思路 + 合适的工具
+本文涉及到的分析工具
+jdk tools：jstat、jmap、jhat
+MAT
+jProfiler">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_发现_素材2.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_发现_素材0.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_线索_素材1.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_线索_素材2.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_定位_mat_1.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_定位_mat_2.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_定位_mat_3.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_定位_mat_4.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_定位_mat_5.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_定位_mat_6.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_定位_mat_7.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_定位_jprofiler_1.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_定位_jprofiler_2.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_解决_素材2.png">
+<meta property="og:image" content="https://monkeyissexy.github.io/images/内存泄漏_解决_素材1.png">
+<meta property="og:updated_time" content="2016-12-16T13:52:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一次内存泄漏问题的解决过程">
+<meta name="twitter:description" content="一次内存泄漏问题的解决过程本案例是针对生产系统内存泄漏的分析和解决过程。
+这次生产案例的分析过程很曲折，通过这个case与大家分享下以后遇到此类问题的分析经验，也同时记录下对过程的回顾，温故而知新；
+其实大家看完本文后，会发现这类问题也不是那么难解决：思路 + 合适的工具
+本文涉及到的分析工具
+jdk tools：jstat、jmap、jhat
+MAT
+jProfiler">
+<meta name="twitter:image" content="https://monkeyissexy.github.io/images/内存泄漏_发现_素材2.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://monkeyissexy.github.io/2016/12/16/memory_leak_fix/"/>
+
+  <title> 一次内存泄漏问题的解决过程 | Monkey is Sexy! </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?e3eaf9cb0e468d1de706431e5cafa74f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Monkey is Sexy!</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                一次内存泄漏问题的解决过程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-12-16T21:41:17+08:00" content="2016-12-16">
+              2016-12-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/jvm/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/jvm/内存泄漏/" itemprop="url" rel="index">
+                    <span itemprop="name">内存泄漏</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/12/16/memory_leak_fix/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/12/16/memory_leak_fix/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="一次内存泄漏问题的解决过程"><a href="#一次内存泄漏问题的解决过程" class="headerlink" title="一次内存泄漏问题的解决过程"></a>一次内存泄漏问题的解决过程</h3><p>本案例是针对生产系统内存泄漏的分析和解决过程。</p>
+<p>这次生产案例的分析过程很曲折，通过这个case与大家分享下以后遇到此类问题的分析经验，也同时记录下对过程的回顾，温故而知新；</p>
+<p>其实大家看完本文后，会发现这类问题也不是那么难解决：思路 + 合适的工具</p>
+<h3 id="本文涉及到的分析工具"><a href="#本文涉及到的分析工具" class="headerlink" title="本文涉及到的分析工具"></a>本文涉及到的分析工具</h3><ul>
+<li>jdk tools：jstat、jmap、jhat</li>
+<li>MAT</li>
+<li>jProfiler</li>
+</ul>
+<a id="more"></a>
+<h3 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h3><p>下面主要分为3部分</p>
+<ol>
+<li>现象</li>
+<li>定位问题</li>
+<li>重现和解决</li>
+</ol>
+<h4 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h4><ul>
+<li>通过监控发现，到达某个点后，fgc频率猛增；（这个监控是发生过一次之后才加上的）</li>
+</ul>
+<p><img src="/images/内存泄漏_发现_素材2.png" alt=""></p>
+<p>===========分割线==小插曲==开始============</p>
+<p>当我们把所有服务的gc监控加上之后，发现系统中所有RMI服务的fgc都很有规律，每隔一个小时做一次，无论old区有没有满。</p>
+<p>起初，怀疑是不是heap中瞬间有大量对象生成导致的，我们对一个对象进行实例化其实是一个内存分配的过程，通常情况下是被优先分配到young区的，但如果瞬间产生大对象导致young区不够分配，则对象会直接晋升到old区，而old区也装不下，从而会导致一次fgc，但是很不幸，分析了下每次发生fgc时，业务日志没发现有异常的点。</p>
+<p>后来各种google，找到了答案。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">http://docs.oracle.com/javase/6/docs/technotes/guides/rmi/sunrmiproperties.html</div><div class="line"></div><div class="line">sun.rmi.dgc.server.gcInterval (1.2 and later)</div><div class="line">When it is necessary to ensure that unreachable remote objects </div><div class="line">are unexported and garbage collected in a timely fashion, </div><div class="line">the value of this property represents the maximum interval</div><div class="line"> (in milliseconds) that the Java RMI runtime will allow </div><div class="line"> between garbage collections of the local heap. The default </div><div class="line"> value is 3600000 milliseconds (one hour).</div><div class="line"></div><div class="line">http://www.51testing.com/html/10/367410-858164.html</div><div class="line"></div><div class="line">http://hllvm.group.iteye.com/group/topic/27945</div></pre></td></tr></table></figure>
+<p>后来配置jvm参数<code>-XX:+DisableExplicitGC</code>解决了，限制所有的显示gc调用，如System.gc()；</p>
+<p>目前我们服务的jvm参数经过优化之后的配置大概如下，对部分参数有兴趣的可以下去查下：</p>
+<p>优化前</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">-server </div><div class="line">-Xmx512m </div><div class="line">-Xms512m </div><div class="line">-Xmn128m</div><div class="line">-XX:MaxPermSize=64m </div><div class="line">-Xss256k</div><div class="line">-XX:+UseParNewGC </div><div class="line">-XX:+UseConcMarkSweepGC </div><div class="line">-XX:+HeapDumpOnOutOfMemoryError</div></pre></td></tr></table></figure>
+<p>优化后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">-server </div><div class="line">-Xmx1024m </div><div class="line">-Xms1024m </div><div class="line">-Xmn384m </div><div class="line">-XX:PermSize=128m </div><div class="line">-XX:MaxPermSize=128m </div><div class="line">-Xss256k</div><div class="line">-XX:+UseParNewGC </div><div class="line">-XX:+UseConcMarkSweepGC </div><div class="line">-XX:+HeapDumpOnOutOfMemoryError </div><div class="line">-XX:CMSInitiatingOccupancyFraction=80 </div><div class="line">-XX:+UseCMSInitiatingOccupancyOnly </div><div class="line">-XX:+UseCMSCompactAtFullCollection </div><div class="line">-XX:CMSFullGCsBeforeCompaction=1 </div><div class="line">-XX:+CMSParallelRemarkEnabled </div><div class="line">-XX:+DisableExplicitGC</div></pre></td></tr></table></figure>
+<p>这里还有一个小公式，大神们总结的：<code>CMSInitiatingOccupancyFraction &lt;=((Xmx-Xmn)-(Xmn-Xmn/(SurvivorRatior+2)))/(Xmx-Xmn)*100</code></p>
+<p>本来打算关于jvm gc相关单独整理一篇，看了下网上实在有很多帖子，这些原理性的内容就不造轮子了，还是已实战干货输出为主吧；</p>
+<p>===========分割线==小插曲==结束============</p>
+<p>好的，这个插曲也还挺有意思的，下面我们言归正传，回到主题。</p>
+<ul>
+<li>使用jstat观察当时gc情况 <code>jstat -gcutil pid 1000</code></li>
+</ul>
+<p><img src="/images/内存泄漏_发现_素材0.png" alt=""></p>
+<p>通过上面的两个截图，可以发现系统跑了一段时间，在达到某一个点之后，fgc开始很频繁，而且每次gc后无法释放出可用的空间。这类现象是典型的内存泄漏症状（排除了系统压力、内存配置太小的两个因素），下面我们准备收集线索类证实这个判定。</p>
+<h4 id="定位"><a href="#定位" class="headerlink" title="定位"></a>定位</h4><h5 id="收集下内存中曾经分配过的对象实例和内存的占用情况"><a href="#收集下内存中曾经分配过的对象实例和内存的占用情况" class="headerlink" title="收集下内存中曾经分配过的对象实例和内存的占用情况"></a>收集下内存中曾经分配过的对象实例和内存的占用情况</h5><p>命令：<code>jmap -histo pid | less</code> </p>
+<p><img src="/images/内存泄漏_线索_素材1.png" alt=""></p>
+<p><code>-histo</code>参数：表示heap中曾经分配过的实例，没有对比这个命令就没有太大的参考价值，所以下面我们再看一下当前heap中还存活的实例情况</p>
+<h5 id="收集下当前还存活的对象情况"><a href="#收集下当前还存活的对象情况" class="headerlink" title="收集下当前还存活的对象情况"></a>收集下当前还存活的对象情况</h5><p>命令：<code>jmap -histo:live pid | less</code> (请注意：live这个命令会触发一次fgc)</p>
+<p><img src="/images/内存泄漏_线索_素材2.png" alt=""></p>
+<p>对于这两个命令，我们不能只看实例排名，因为排名高的很可能是由于其它实例所产生的，所以针对分析内存泄漏的关注点，应该放在那些可疑实例身上，当可疑点比较多时候，优先抓典型的。通过这两次gc前后内存中对象实例的对比，可以发现某些实例的数量保持不变，并未减少，比方说我们这里的：<code>MultiTreadedHttpConnectionManager$HostConnectionPool</code></p>
+<p>查了下这两个类的用处：</p>
+<blockquote>
+<p>MultiTreadedHttpConnectionManager是apache commons-httpclient中的一个链接池管理器，HostConnectionPool是它的内部类。</p>
+</blockquote>
+<p>既然是链接池怎么会生成这么多呢？而且无法释放呢？好，暂可以把它列为可疑点；</p>
+<p>接下来，带着上面的疑问，我们再借助于工具，看看机器是否也是这样认为。</p>
+<h5 id="收集memory-dump"><a href="#收集memory-dump" class="headerlink" title="收集memory dump"></a>收集memory dump</h5><p>命令 <code>jmap -dump:format=b,file=jmap_dump_pid.hprof pid</code> </p>
+<p>当有内存泄漏的情况时，dump出来的内存文件，可能会很大，本次的文件大致有1G多点。</p>
+<p><code>jmap_dump_pid.hprof</code>dump文件可以用两种工具来分析：</p>
+<ul>
+<li><p>jhat</p>
+<p>  jhat比较方便，jdk原生工具，不用另外安装，但分析起来不够友好；</p>
+</li>
+<li><p>mat</p>
+<p>  mat是eclipse的一个插件，需要安装下载，但是比较直观，方便分析；（新版本的eclipse默认就可以打开hprof文件）</p>
+</li>
+</ul>
+<p>这个案例中，我们将选择使用MAT来分析。</p>
+<p>使用eclipse，file–&gt;open file，选择上面的文件即可；</p>
+<p>首先，会有一个分析试图供我们选择，这里我们选择 memory leak 报告</p>
+<p><img src="/images/内存泄漏_定位_mat_1.png" alt=""></p>
+<p>点击 finish 后，会默认生成一个泄漏的可疑报告，如下：</p>
+<p><img src="/images/内存泄漏_定位_mat_2.png" alt=""></p>
+<p>指向了 MultiThreadedHttpConnectionManager ，快接近了，下面我们看下详情，为什么这个对象这么大。</p>
+<p><img src="/images/内存泄漏_定位_mat_3.png" alt=""></p>
+<p>通过上图我们看出</p>
+<ol>
+<li>通过shortest path，可疑看到这个对象的gc path是由于被IdleConnectionTimeoutTread引用了，所以无法被gc；</li>
+<li>通过 shallow heap 和 retained heap，可以看出来MultiThreadedHttpConnectionManager本身对象很小，之所以占用的内存大，是因为引用的对象大导致的。</li>
+</ol>
+<blockquote>
+<p>关于shallow 和 retained</p>
+<p>shallow heap ： 对象本身可释放的大小；<br>retained heap ： 对象本身 + 引用的对象，可释放的大小</p>
+</blockquote>
+<p>所以，下面我看看下这个对象引用的有哪些东西，真相越来越近了。</p>
+<blockquote>
+<p>outgoing 和 incoming </p>
+<p>outgoing： a对象引用了哪些对象；incoming： a对象被哪些对象引用</p>
+</blockquote>
+<p><img src="/images/内存泄漏_定位_mat_4.png" alt=""></p>
+<p>选择外部引用查看，展开之后，会展示出来这个对象所有的外部引用，并且所有的内存都被一个叫mapHosts的HashMap给消耗了。</p>
+<p><img src="/images/内存泄漏_定位_mat_5.png" alt=""></p>
+<p>是不是很激动，马上看一下hashmap里面究竟是什么。</p>
+<p><img src="/images/内存泄漏_定位_mat_6.png" alt=""></p>
+<p>commons-httpclient 为每个请求host（HttpHost）都建立了链接池，达到空间时间后会销毁掉；那么按照这个说法肯定有很多不同的请求host了？看了下key里面语句的host地址，发现都是一样的<code>mapi.alipay.com</code><br><img src="/images/内存泄漏_定位_mat_7.png" alt=""></p>
+<p>host一样，怎么还会放多个呢？而且一直无法销毁，越积越多，接着分析了下httpclient部分的源代码发现，mapHosts的key是HostConfiguration，而对比HostConfiguration是否一样主要是看它的属性HttpHost中：hostname、port、protocol，只要这三个是一样的，那么就发请求时就可以复用host对应链接池中的（如果还存在的话，引用有idle时间）。主要代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> HostConnectionPool <span class="title">getHostPool</span><span class="params">(HostConfiguration hostConfiguration, <span class="keyword">boolean</span> create)</span> </span>&#123;</div><div class="line">      LOG.trace(<span class="string">"enter HttpConnectionManager.ConnectionPool.getHostPool(HostConfiguration)"</span>);</div><div class="line"></div><div class="line">      <span class="comment">// Look for a list of connections for the given config</span></div><div class="line">      HostConnectionPool listConnections = (HostConnectionPool) </div><div class="line">              mapHosts.get(hostConfiguration);</div><div class="line">      <span class="keyword">if</span> ((listConnections == <span class="keyword">null</span>) &amp;&amp; create) &#123;</div><div class="line">          <span class="comment">// First time for this config</span></div><div class="line">          listConnections = <span class="keyword">new</span> HostConnectionPool();</div><div class="line">          listConnections.hostConfiguration = hostConfiguration;</div><div class="line">          mapHosts.put(hostConfiguration, listConnections);</div><div class="line">      &#125;</div><div class="line">          </div><div class="line">      <span class="keyword">return</span> listConnections;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>发现所有的hostname、port都是一样的，除了protocol，这里的protocol是用户自定义的，而且是不属于这个模块的。</p>
+<p>后来在另一个模块中，找到了元凶，它注册了一个全局的ProtocolSocketFactory，代码如下，注册完之后，整个jvm进程里用到httpclient发送443端口的请求时，都会从全局变量里面查找443端口的协议，所以导致同一个进程内的其它模块发请求也用到了这个协议。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">SimpleHttpsClient</span><span class="params">()</span> </span>&#123;</div><div class="line">	Protocol.registerProtocol(<span class="string">"https"</span>, <span class="keyword">new</span> Protocol(<span class="string">"https"</span>, <span class="keyword">new</span> SimpleHttpsSocketFactory(), <span class="number">443</span>));</div><div class="line">	registerPort(Integer.valueOf(<span class="number">443</span>));</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> HttpSendResult <span class="title">postRequest</span><span class="params">(String url, Map&lt;String, String&gt; params, <span class="keyword">int</span> timeout, String characterSet)</span> </span>&#123;</div><div class="line">	<span class="keyword">if</span> ((characterSet == <span class="keyword">null</span>) || (<span class="string">""</span>.equals(characterSet))) &#123;</div><div class="line">		characterSet = <span class="string">"UTF-8"</span>;</div><div class="line">	&#125;</div><div class="line">	HttpSendResult result = <span class="keyword">new</span> HttpSendResult();</div><div class="line">	PostMethod postMethod = <span class="keyword">new</span> PostMethod(url);</div><div class="line">	postMethod.setRequestHeader(<span class="string">"Connection"</span>, <span class="string">"close"</span>);</div><div class="line">	postMethod.addRequestHeader(<span class="string">"Content-Type"</span>, <span class="string">"application/x-www-form-urlencoded;charset="</span> + characterSet);</div><div class="line"></div><div class="line">	NameValuePair[] data = createNameValuePair(params);</div><div class="line">	postMethod.setRequestBody(data);</div><div class="line"></div><div class="line">	HttpClient client = <span class="keyword">new</span> HttpClient();</div><div class="line">	client.getParams().setSoTimeout(timeout);</div><div class="line">	<span class="keyword">try</span> &#123;</div><div class="line">		<span class="keyword">int</span> status = client.executeMethod(postMethod);</div><div class="line">		InputStream is = postMethod.getResponseBodyAsStream();</div><div class="line">		String responseBody = IOUtils.toString(is, characterSet);</div><div class="line">		result.setStatus(status);</div><div class="line">		result.setResponseBody(responseBody);</div><div class="line">	&#125; <span class="keyword">catch</span> (Exception ex) &#123;</div><div class="line">		ex.printStackTrace();</div><div class="line">	&#125; <span class="keyword">finally</span> &#123;</div><div class="line">		postMethod.releaseConnection();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>SimpleHttpsClient所在模块发请求时的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> SimpleHttpsClient(). postRequest();</div></pre></td></tr></table></figure>
+<p>而SimpleHttpsClient所在的这个模块每次发请求时，没有用到链接池，都会new一个SimpleHttpsClient实例，所以导致全局变量中443端口对应的实例会不断变化，这样以来只要SimpleHttpsClient模块发一次请求，那么443端口对应的实例就会变化，那么同样的hostname就会有多个链接池实例存在于mapHosts中，而mapHosts归属于MultiThreadedHttpConnectionManager，MultiThreadedHttpConnectionManager又归属于IdleConnectionTimeoutTread，IdleConnectionTimeoutTread又归属于一个月进程同在的线程，所以mapHosts最终也无法被回收掉。</p>
+<h4 id="重现和解决"><a href="#重现和解决" class="headerlink" title="重现和解决"></a>重现和解决</h4><p>本地重现这个问题，只要SimpleHttpsClient与问题模块的请求交替调用，则就会导致HostConnectionPool越来越多。于是写了个单元测试，一共10w调请求，交替发送请求；</p>
+<p>借助jProfiler实时查看jvm运行时内存中对象实例的情况；</p>
+<p><img src="/images/内存泄漏_定位_jprofiler_1.png" alt=""></p>
+<p>可以发现HostConnectionPool，短时间内数量猛增，而且主动调用gc数量没有下降。</p>
+<p>再去问题元凶处查看了下代码逻辑，发现并未用到ssl，但是代码里却注册了sslcontext，于是把注册这块的代码注释掉，再跑了一遍测试，效果如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SimpleHttpsClient</span><span class="params">()</span> </span>&#123;</div><div class="line"><span class="comment">//		Protocol.registerProtocol("https", new Protocol("https", new SimpleHttpsSocketFactory(), 443));</span></div><div class="line"><span class="comment">//		registerPort(Integer.valueOf(443));</span></div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p><img src="/images/内存泄漏_定位_jprofiler_2.png" alt=""></p>
+<p>数量并未增加，而且主动点击gc之后，可以正常释放掉。</p>
+<p>另外一种解决方案，将commons-client替换为httpcomponents-httpclient，但是这种我在写的时候没有用到链接池管理，所以处理效率会有所下降，效率是通过什么看到的呢？使用同样的测试代码，同时用这两种方案进行测试，期间观察下cpu使用情况即可。（jProfiler的这个功能也适用于对代码性能的调优，通过分析cpu主要都耗费在什么操作上了，然后重点该操作的优化即可）</p>
+<p>上面第一种修改方案的cpu使用情况如下：</p>
+<p><img src="/images/内存泄漏_解决_素材2.png" alt=""></p>
+<p>使用httpcomponents-httpclient修改方案的cpu使用情况如下：</p>
+<p><img src="/images/内存泄漏_解决_素材1.png" alt=""></p>
+<p>相比之下，有链接池的效率要高一些，因为不用每次实例化新的链接对象了，所以目前选用第一种修改方案，但是接下来还是要测试下httpcomponents-httpclient的链接池效率。</p>
+<h3 id="一些总结"><a href="#一些总结" class="headerlink" title="一些总结"></a>一些总结</h3><p>至此，这个问题终于解决了，修复上线到现在gc都很正常。</p>
+<p>其实在真实的分析过程并没有这么顺利，尤其在重现问题的时候，现在又梳理了下还是感觉更清晰了一些的，这类问题多处理几次就顺手了，经验都是这样慢慢锻炼出来滴。。。</p>
+<p>简单总结下：</p>
+<ol>
+<li>监控一定要提前加，能够把很多问题扼杀在萌芽期；</li>
+<li><p>开发时不要用太老的工具包，社区不活跃、bug没人fix；</p>
+<p> <a href="https://issues.apache.org/jira/browse/HTTPCLIENT-799" target="_blank" rel="external">https://issues.apache.org/jira/browse/HTTPCLIENT-799</a> 系统的错误日志一定要慎重对待，不能因为当时没有什么影响而不去管它，你想到的肯定会发生的，只是时间问题；</p>
+</li>
+<li><p>对jvm底层原理要有一定的了解，助于分析；</p>
+</li>
+<li>实战是很锻炼人的、也是提升最快的；</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jvm/" rel="tag">#jvm</a>
+          
+            <a href="/tags/内存泄漏/" rel="tag">#内存泄漏</a>
+          
+            <a href="/tags/mat/" rel="tag">#mat</a>
+          
+            <a href="/tags/jprofiler/" rel="tag">#jprofiler</a>
+          
+            <a href="/tags/jmap/" rel="tag">#jmap</a>
+          
+            <a href="/tags/jhat/" rel="tag">#jhat</a>
+          
+            <a href="/tags/jstat/" rel="tag">#jstat</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/11/httpclient_ssl_handshake_socketTimeout_bug/" rel="next" title="httpclient ssl handshake socketTimeout bug 分析解决过程">
+                <i class="fa fa-chevron-left"></i> httpclient ssl handshake socketTimeout bug 分析解决过程
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/03/jvm_problem_location/" rel="prev" title="一些常用的jvm问题定位、分析工具">
+                一些常用的jvm问题定位、分析工具 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="hongliang wang" />
+          <p class="site-author-name" itemprop="name">hongliang wang</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/monkeyissexy" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        <div class="links-of-author motion-element">
+            
+                <p class="site-author-name">友情链接</p>
+                
+                    <span class="links-of-author-item">
+                    <a href="https://elephantme.github.io/" target="_blank">Elephant Me</a>
+                    </span>
+                
+            
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一次内存泄漏问题的解决过程"><span class="nav-number">1.</span> <span class="nav-text">一次内存泄漏问题的解决过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本文涉及到的分析工具"><span class="nav-number">2.</span> <span class="nav-text">本文涉及到的分析工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正文"><span class="nav-number">3.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#现象"><span class="nav-number">3.1.</span> <span class="nav-text">现象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定位"><span class="nav-number">3.2.</span> <span class="nav-text">定位</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#收集下内存中曾经分配过的对象实例和内存的占用情况"><span class="nav-number">3.2.1.</span> <span class="nav-text">收集下内存中曾经分配过的对象实例和内存的占用情况</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#收集下当前还存活的对象情况"><span class="nav-number">3.2.2.</span> <span class="nav-text">收集下当前还存活的对象情况</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#收集memory-dump"><span class="nav-number">3.2.3.</span> <span class="nav-text">收集memory dump</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重现和解决"><span class="nav-number">3.3.</span> <span class="nav-text">重现和解决</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一些总结"><span class="nav-number">4.</span> <span class="nav-text">一些总结</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a href="/">Monkey is Sexy!</a></span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'monkeyissexy';
+      var disqus_identifier = '2016/12/16/memory_leak_fix/';
+      var disqus_title = "一次内存泄漏问题的解决过程";
+      var disqus_url = 'https://monkeyissexy.github.io/2016/12/16/memory_leak_fix/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

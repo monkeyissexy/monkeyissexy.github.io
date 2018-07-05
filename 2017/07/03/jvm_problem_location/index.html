@@ -1,0 +1,801 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="一些常用的jvm监控和分析工具
+JProfiler、TProfiler
+greys、BTrace、HouseMD
+jconsole
+jmap、MAT
+jstat
+jstack、top
+netstat
+iostat
+
+下面的讲述中会围绕这些工具；">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一些常用的jvm问题定位、分析工具">
+<meta property="og:url" content="https://monkeyissexy.github.io/2017/07/03/jvm_problem_location/index.html">
+<meta property="og:site_name" content="Monkey is Sexy!">
+<meta property="og:description" content="一些常用的jvm监控和分析工具
+JProfiler、TProfiler
+greys、BTrace、HouseMD
+jconsole
+jmap、MAT
+jstat
+jstack、top
+netstat
+iostat
+
+下面的讲述中会围绕这些工具；">
+<meta property="og:updated_time" content="2017-07-03T08:11:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一些常用的jvm问题定位、分析工具">
+<meta name="twitter:description" content="一些常用的jvm监控和分析工具
+JProfiler、TProfiler
+greys、BTrace、HouseMD
+jconsole
+jmap、MAT
+jstat
+jstack、top
+netstat
+iostat
+
+下面的讲述中会围绕这些工具；">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://monkeyissexy.github.io/2017/07/03/jvm_problem_location/"/>
+
+  <title> 一些常用的jvm问题定位、分析工具 | Monkey is Sexy! </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?e3eaf9cb0e468d1de706431e5cafa74f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Monkey is Sexy!</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                一些常用的jvm问题定位、分析工具
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-07-03T15:16:17+08:00" content="2017-07-03">
+              2017-07-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/jvm/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/07/03/jvm_problem_location/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/07/03/jvm_problem_location/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="一些常用的jvm监控和分析工具"><a href="#一些常用的jvm监控和分析工具" class="headerlink" title="一些常用的jvm监控和分析工具"></a>一些常用的jvm监控和分析工具</h3><ul>
+<li>JProfiler、TProfiler</li>
+<li>greys、BTrace、HouseMD</li>
+<li>jconsole</li>
+<li>jmap、MAT</li>
+<li>jstat</li>
+<li>jstack、top</li>
+<li>netstat</li>
+<li>iostat</li>
+</ul>
+<p>下面的讲述中会围绕这些工具；</p>
+<a id="more"></a>
+<p>首先，对监控、开发者</p>
+<ul>
+<li>监控：能够提前发现问题（预警）</li>
+<li>开发者：能快速定位问题</li>
+</ul>
+<p>服务器可简单分为 </p>
+<ul>
+<li>CPU</li>
+<li>内存</li>
+<li>硬盘</li>
+<li>操作系统</li>
+</ul>
+<p>操作系统是来协同CPU、内存、硬盘的，而jvm运行在操作系统上，所以jvm会借助操作系统来操作CPU、内存、硬盘。 </p>
+<h3 id="可以和zabbix结合的一些监控项"><a href="#可以和zabbix结合的一些监控项" class="headerlink" title="可以和zabbix结合的一些监控项"></a>可以和zabbix结合的一些监控项</h3><table>
+<thead>
+<tr>
+<th>监控项</th>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gc</td>
+<td><code>jstat</code></td>
+<td>fgc、ygc的次数和占比，达到一定阀值，报警</td>
+</tr>
+<tr>
+<td>thread</td>
+<td><code>proc/pid</code><br><code>jstack</code></td>
+<td>linux上万物皆文件，利用proc命令，监控jvm进程内部的线程数量；jstack定期收集线程快照，抓取快照中重要的几个状态，如：<br>死锁：Deadlock<br>等待资源：Waiting on condition<br>等待获取监视器：Waiting on monitor entry<br>阻塞：Blocked</td>
+</tr>
+<tr>
+<td>cpu</td>
+<td><code>top</code><br><code>top -H -p pid</code> <br><code>jstack</code></td>
+<td>监控cpu使用率过高时，实时抓取进程中cpu使用较高的线程的堆栈信息，并通过预警发给开发</td>
+</tr>
+<tr>
+<td>network</td>
+<td><code>netstat</code></td>
+<td>监控jvm进程的各种状态下链接的数量，可以帮助分析和定位问题，比方说httpclient链接没有释放等等；ESTABLISHED 等等</td>
+</tr>
+<tr>
+<td>io</td>
+<td><code>iostat</code> <code>iotop</code></td>
+</tr>
+</tbody>
+</table>
+<p>定位内存问题：</p>
+<p>常见的有内存溢出（OOM）、GC问题</p>
+<p>OOM：使用jmap dump内存堆栈信息，并用MAT工具分析，这是相对常用且易用的方式；</p>
+<h3 id="三大性能、监控、定位问题神器说明和对比"><a href="#三大性能、监控、定位问题神器说明和对比" class="headerlink" title="三大性能、监控、定位问题神器说明和对比"></a>三大性能、监控、定位问题神器说明和对比</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>出品方</th>
+<th>是否有界面</th>
+<th>是否需要改动jvm配置</th>
+<th>是否可以远程监控</th>
+<th>定位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://resources.ej-technologies.com/jprofiler/help/doc/" target="_blank" rel="external">JProfiler</a></td>
+<td>EJ</td>
+<td>有</td>
+<td>是</td>
+<td>是</td>
+<td>全面排查系统各项指标，适合定期排查、摸底</td>
+</tr>
+<tr>
+<td><a href="https://github.com/alibaba/TProfiler" target="_blank" rel="external">TProfiler</a></td>
+<td>阿里</td>
+<td>无</td>
+<td>否</td>
+<td>是</td>
+<td>周期取样，分析、排查整个系统各个性能，适合长期使用</td>
+</tr>
+<tr>
+<td><a href="https://github.com/oldmanpushcart/greys-anatomy" target="_blank" rel="external">greys</a></td>
+<td>阿里</td>
+<td>无</td>
+<td>否</td>
+<td>是</td>
+<td>适用于业务系统问题的排查、一些影响性能的问题排查，类似的工具有 <a href="https://github.com/CSUG/HouseMD" target="_blank" rel="external">HouseMD</a> 、<a href="https://github.com/btraceio/btrace" target="_blank" rel="external">BTrace</a> ; greys的作者对这款工具的定位：这也是这款工具的定位：业务问题排查；专业的性能分析，我肯定还是推荐JProfiler</td>
+</tr>
+</tbody>
+</table>
+<p>btrace、housemd、greys 的原理</p>
+<p>ASM字节码增强</p>
+<p>greys使用</p>
+<p>个人觉得比较好的有以下3个：</p>
+<ul>
+<li>tt 监控方法中的每个内部方法的调用时间，可看具体出入参数、堆栈</li>
+<li>trace 可以针对接口、实现类，比较细致</li>
+<li>ptrace 只能针对实现类，结合tt，但只能统计所有内部方法的调用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"># 监控具体方法的详细调用栈</div><div class="line">trace com.swwx.payright.management.controller.UserController login</div><div class="line">trace com.swwx.payright.management.controller.UserController *</div><div class="line"></div><div class="line">trace com.swwx.payright.management.service.UserService getMenuByUserId</div><div class="line">trace com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">ptrace -t com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">stack 3 com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId params[0]==1</div><div class="line"></div><div class="line">tt -t com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">#只监控3次调用</div><div class="line">tt -t -n 3 com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId</div><div class="line"></div><div class="line">#增加过滤条件</div><div class="line">tt -t -n 3 com.swwx.payright.management.service.impl.UserServiceImpl getMenuByUserId params[0]==1</div><div class="line"></div><div class="line"># 查看某次调用的详细信息，包含入参、出参、堆栈</div><div class="line">tt -i index</div><div class="line"></div><div class="line"># 重放某次方法的调用</div><div class="line">tt -i index -p</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/16/memory_leak_fix/" rel="next" title="一次内存泄漏问题的解决过程">
+                <i class="fa fa-chevron-left"></i> 一次内存泄漏问题的解决过程
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="hongliang wang" />
+          <p class="site-author-name" itemprop="name">hongliang wang</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/monkeyissexy" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        <div class="links-of-author motion-element">
+            
+                <p class="site-author-name">友情链接</p>
+                
+                    <span class="links-of-author-item">
+                    <a href="https://elephantme.github.io/" target="_blank">Elephant Me</a>
+                    </span>
+                
+            
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一些常用的jvm监控和分析工具"><span class="nav-number">1.</span> <span class="nav-text">一些常用的jvm监控和分析工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可以和zabbix结合的一些监控项"><span class="nav-number">2.</span> <span class="nav-text">可以和zabbix结合的一些监控项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三大性能、监控、定位问题神器说明和对比"><span class="nav-number">3.</span> <span class="nav-text">三大性能、监控、定位问题神器说明和对比</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a href="/">Monkey is Sexy!</a></span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'monkeyissexy';
+      var disqus_identifier = '2017/07/03/jvm_problem_location/';
+      var disqus_title = "一些常用的jvm问题定位、分析工具";
+      var disqus_url = 'https://monkeyissexy.github.io/2017/07/03/jvm_problem_location/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
